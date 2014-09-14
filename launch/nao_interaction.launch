@@ -1,0 +1,17 @@
+<launch>
+    <!-- Global parameters -->
+    <param name="nao_tts_cache" value="$(find nao_hri)/launch/tts_cache.txt" />
+
+
+    <!-- Fake people -->
+    <node pkg="tf" type="static_transform_publisher" name="base_link_to_map" args="0 0 1 0 0 0 /map /base_link 20" />
+
+    <node pkg="tf" type="static_transform_publisher" name="person1_head" args="2 2 1.9 0 0 0 /map /person1_head 20" />
+    <node pkg="tf" type="static_transform_publisher" name="person1_torso" args="2 2 1 0 0 0 /map /person1_torso 20" />
+
+    <node pkg="tf" type="static_transform_publisher" name="person2_head" args="2 0.3 1.76 0 0 0 /map /person2_head 20" />
+    <node pkg="tf" type="static_transform_publisher" name="person2_torso" args="2 0.3 1.16 0 0 0 /map /person2_torso 20" />
+
+    <node pkg="tf" type="static_transform_publisher" name="person3_head" args="1 -1 1.5 0 0 0 /map /person3_head 20" />
+    <node pkg="tf" type="static_transform_publisher" name="person3_torso" args="1 -1 0.9 0 0 0 /map /person3_torso 20" />
+</launch>
