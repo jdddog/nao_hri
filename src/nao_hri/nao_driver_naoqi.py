@@ -29,60 +29,65 @@
 from threading import Thread
 
 import rospy
+from optparse import OptionParser
 
 # import Aldebaran API (must be in PYTHONPATH):
 try:
-    from naoqi import ALProxy
+    from naoqi import ALProxy, ALBroker, ALModule
 except ImportError:
     raise RuntimeError("Error importing NaoQI. Please make sure that Aldebaran's NaoQI API is in your PYTHONPATH.")
 
-class NaoNode():
-    """
-    A ROS Node wrapper that can help you connect to NAOqi and deal with ROS shutdown
-    To start your node, just call:
-    my_node = MyNode('my_node')
-    my_node.start() # that will spawn your node in a thread (and run whatever is in the run() function
-    rospy.spin()
-    # when killing ROS, the node will automatically stop its main loop, exit, and then unsubscribe from ALMemory events
-    # and call whatever you have in unsubscribe()
-    Then, if your node needs to process data, you just needs to have a run function:
 
-    def run(Self):
-        #do some initialization
-        while self.is_looping():
-            # do something
-        # do some post processing
-    """
-    def __init__(self, name):
-        """
-        :param name: the name of the ROS node
-        """
-        super(NaoNode, self).__init__()
+class NaoNode(ALModule):
+
+    def __init__(self, module_name):
+        self.parse_options(module_name)
+        self.init_broker()
 
         # A distutils.version.LooseVersion that contains the current verssion of NAOqi we're connected to
         self.__naoqi_version = None
-        self.__name = name
 
         ## NAOqi stuff
         # dict from a modulename to a proxy
         self.__proxies = {}
 
         # If user has set parameters for ip and port use them as default
-        default_ip = rospy.get_param("~pip", "127.0.0.1")
-        default_port = rospy.get_param("~pport", 9559)
+        self.default_ip = rospy.get_param("~pip", "127.0.0.1")
+        self.default_port = rospy.get_param("~pport", 9559)
 
-        # get connection from command line:
-        from argparse import ArgumentParser
-        parser = ArgumentParser()
-        parser.add_argument("--pip", dest="pip", default=default_ip,
-                          help="IP/hostname of parent broker. Default is 127.0.0.1.", metavar="IP")
-        parser.add_argument("--pport", dest="pport", default=default_port, type=int,
-                          help="port of parent broker. Default is 9559.", metavar="PORT")
+    def parse_options(self, module_name):
+        parser = OptionParser()
+        parser.add_option("--ip", dest = "ip", default = "",
+                          help = "IP/hostname of broker. Default is system's default IP address.", metavar = "IP")
+        parser.add_option("--port", dest = "port", default = 0,
+                          help = "IP/hostname of broker. Default is 1051.", metavar = "PORT")
+        parser.add_option("--pip", dest = "pip", default = "127.0.0.1",
+                          help = "IP/hostname of parent broker. Default is 127.0.0.1.", metavar = "IP")
+        parser.add_option("--pport", dest = "pport", default = 9559,
+                          help = "port of parent broker. Default is 9559.", metavar = "PORT")
 
-        import sys
-        args = parser.parse_args(args=rospy.myargv(argv=sys.argv)[1:])
-        self.pip = args.pip
-        self.pport = args.pport
+        (options, args) = parser.parse_args()
+        self.ip = options.ip
+        self.port = int(options.port)
+        self.pip = options.pip
+        self.pport = int(options.pport)
+        self.module_name = module_name
+
+    def init_broker(self):
+        # before we can instantiate an ALModule, an ALBroker has to be created
+        rospy.loginfo("Connecting to NaoQi at %s:%d", self.pip, self.pport)
+        try:
+            self.broker = ALBroker("%sBroker" % self.module_name, self.ip, self.port, self.pip, self.pport)
+        except RuntimeError, e:
+            print("Could not connect to NaoQi's main broker")
+            exit(1)
+        ALModule.__init__(self, self.module_name)
+
+        self.memProxy = ALProxy("ALMemory", self.pip, self.pport)
+        # TODO: check self.memProxy.version() for > 1.6
+        if self.memProxy is None:
+            rospy.logerr("Could not get a proxy to ALMemory on %s:%d", self.pip, self.pport)
+            exit(1)
 
     def get_proxy(self, name, warn=True):
         """
@@ -124,3 +129,19 @@ class NaoNode():
             self.__naoqi_version = LooseVersion(proxy.version())
 
         return self.__naoqi_version
+
+    # A stupid hack:
+    #   Instead of taking a function pointer as a callback (e.g. self.word_pos_changed)
+    #   subscribeToEvent / unsubscribeToEvent take the name of the class instance as a string and the name of the method
+    #   as a string.
+    #
+    #   Hence, this method finds it for you automatically (if its in the same file)
+
+    def get_instance_name(self):
+        instance_name = ''
+
+        for k, v in list(globals().iteritems()):
+            if v is self:
+                instance_name = k
+
+        return instance_name

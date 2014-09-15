@@ -28,3 +28,12 @@
 
 
 
+from hri_api.entities import Person, World, Saliency
+from hri_api.query import Query
+from nao_hri.nao import Nao, NaoExpression, NaoGesture
+import random
+
+world = World()
+robot = Nao()
+
+robot.blink(0.1, 0.5, 0.1)

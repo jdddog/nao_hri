@@ -29,10 +29,11 @@
 import rospy
 import re
 import md5
-from hri_framework.srv import TextToSpeechSubsentenceDurationResponse
+from hri_msgs.srv import TextToSpeechSubsentenceDurationResponse
 from hri_framework import TextToSpeechActionServer
 from nao_hri import NaoNode
 import rospkg
+import naoqi
 
 
 class TextToSpeechCache():
@@ -78,7 +79,7 @@ class TextToSpeechCache():
             self.tts_time_hashes[md5_digest] = word_times
 
 
-class NaoTextToSpeechActionServer(TextToSpeechActionServer):
+class NaoTextToSpeechActionServer(TextToSpeechActionServer, NaoNode):
 
     def __init__(self):
         TextToSpeechActionServer.__init__(self)
@@ -95,15 +96,17 @@ class NaoTextToSpeechActionServer(TextToSpeechActionServer):
         # Naoqi
         self.tts_proxy = None
         self.mem_proxy = None
-        self.nao_node = NaoNode()
 
     def start(self):
         if rospy.has_param("nao_tts_cache"):
-            path = rospy.has_param("nao_tts_cache")
+            path = rospy.get_param("nao_tts_cache")
             self.tts_cache.load_tts_cache(path)
-            self.tts_proxy = self.nao_node.get_proxy('ALTextToSpeech')
-            self.mem_proxy = self.nao_node.get_proxy('ALMemory')
-            TextToSpeechActionServer.start_server(self)
+
+            NaoNode.__init__(self, self.get_instance_name())
+            self.tts_proxy = self.get_proxy('ALTextToSpeech')
+            self.mem_proxy = self.get_proxy('ALMemory')
+            self.subscribe()
+            TextToSpeechActionServer.start(self)
         else:
             raise Exception('nao_tts_cache parameter not found')
 
@@ -141,7 +144,6 @@ class NaoTextToSpeechActionServer(TextToSpeechActionServer):
         return duration
 
     def current_word_changed(self, event_name, value, sub_id):
-
         if self.current_word_index != 0 and self.server.is_active():
             word_start_time = rospy.get_time() - self.start_time
             self.word_times.append(word_start_time)
@@ -150,7 +152,6 @@ class NaoTextToSpeechActionServer(TextToSpeechActionServer):
         self.current_word_index += 1
 
     def word_pos_changed(self, event_name, value, sub_id):
-
         # If at end of sentence...
         if self.server.is_active() and self.current_word_index >= self.num_words_sentence and value == 0:
             word_start_time = rospy.get_time() - self.start_time
@@ -177,33 +178,20 @@ class NaoTextToSpeechActionServer(TextToSpeechActionServer):
         valid_words_regex = "\w+[']{0,1}\w*[!?,.]{0,1}"
         return re.findall(valid_words_regex, text)
 
-    # A stupid hack:
-    #   Instead of taking a function pointer as a callback (e.g. self.word_pos_changed)
-    #   subscribeToEvent / unsubscribeToEvent take the name of the class instance as a string and the name of the method
-    #   as a string.
-    #
-    #   Hence, this method finds it for you automatically
-
-    def get_instance_name(self):
-        instance_name = ''
-
-        for k, v in list(locals().iteritems()):
-            if v is self:
-                instance_name = k
-
-        return instance_name
-
     def subscribe(self):
-        instance_name = self.get_instance_name()
         self.tts_proxy.enableNotifications()
-        self.mem_proxy.subscribeToEvent("ALTextToSpeech/PositionOfCurrentWord", instance_name, "word_pos_changed")
-        self.mem_proxy.subscribeToEvent("ALTextToSpeech/CurrentWord", instance_name, "current_word_changed")
+        self.mem_proxy.subscribeToEvent("ALTextToSpeech/PositionOfCurrentWord", self.module_name, "word_pos_changed")
+        self.mem_proxy.subscribeToEvent("ALTextToSpeech/CurrentWord", self.module_name, "current_word_changed")
         rospy.loginfo("Subscribed to ALTextToSpeech events.")
 
     def unsubscribe(self):
-        instance_name = self.get_instance_name()
-        self.mem_proxy.unsubscribeToEvent("ALTextToSpeech/PositionOfCurrentWord", instance_name)
-        self.mem_proxy.unsubscribeToEvent("ALTextToSpeech/CurrentWord", instance_name)
+        self.mem_proxy.unsubscribeToEvent("ALTextToSpeech/PositionOfCurrentWord", self.module_name)
+        self.mem_proxy.unsubscribeToEvent("ALTextToSpeech/CurrentWord", self.module_name)
         self.tts_proxy.disableNotifications()
         rospy.loginfo("Un-subscribed from ALTextToSpeech events.")
 
+if __name__ == '__main__':
+    rospy.init_node('tts_action_server')
+    tts_server = NaoTextToSpeechActionServer()
+    tts_server.start()
+    rospy.spin()

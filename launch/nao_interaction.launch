@@ -1,7 +1,32 @@
 <launch>
     <!-- Global parameters -->
     <param name="nao_tts_cache" value="$(find nao_hri)/launch/tts_cache.txt" />
+    <arg name="nao_ip" default="127.0.0.1"/>
+	<arg name="nao_port" default="9559"/>
+	<env name="PYTHONPATH" value="$(env PYTHONPATH)" />
 
+    <!-- Nao ROS drivers -->
+	<node pkg="nao_driver" type="nao_sensors.py" name="nao_sensors" required="true" args="--pip=$(arg nao_ip) --pport=$(arg nao_port)" />
+	<node pkg="nao_driver" type="nao_controller.py" name="nao_controller" required="true" args="--pip=$(arg nao_ip) --pport=$(arg nao_port)" />
+    <node pkg="nao_driver" type="nao_leds.py" name="nao_leds" args="--pip=$(arg nao_ip) --pport=$(arg nao_port)" />
+	<param name="robot_description" command="$(find xacro)/xacro.py $(find nao_description)/urdf/nao_robot_v3.urdf.xacro" />
+	<node pkg="robot_state_publisher" type="state_publisher" name="robot_state_publisher" />
+	<node pkg="nao_description" type="base_footprint" name="base_footprint" />
+
+    <!-- Sensors -->
+	<!--<node pkg="openni_tracker" type="openni_tracker" name="openni_tracker" >-->
+		<!--<param name="camera_frame_id" value="camera_depth_frame"/>-->
+		<!--<param name="smoothing" value="0.7"/>-->
+		<!--<param name="num_users" value="2"/>-->
+	<!--</node>-->
+
+    <!--<node pkg="tf" type="static_transform_publisher" name="nao_to_kinect_transform" args="-0.045 -0.00 -0.04 0.03 1.1 0.0 1.0 nao_marker base_link 10" />-->
+
+	<!--<node name="nao_marker_smoother" pkg="hri_api" type="smoother.py" output="screen">-->
+		<!--<param name="rate" type="int" value="20"/>-->
+		<!--<param name="input_topic" type="string" value="nao_marker_raw"/>-->
+		<!--<param name="output_topic" type="string" value="nao_marker"/>-->
+	<!--</node>-->
 
     <!-- Fake people -->
     <node pkg="tf" type="static_transform_publisher" name="base_link_to_map" args="0 0 1 0 0 0 /map /base_link 20" />

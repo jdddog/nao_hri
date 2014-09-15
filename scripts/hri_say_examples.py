@@ -28,3 +28,15 @@
 
 
 
+from hri_api.entities import Person, World, Saliency
+from hri_api.query import Query
+from nao_hri.nao import Nao, NaoExpression, NaoGesture
+import random
+
+world = World()
+robot = Nao()
+
+a = robot.say('hello my name is Nao')
+robot.wait(a)
+
+robot.say_and_wait('Im a crazy robot')
