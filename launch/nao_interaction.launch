@@ -1,17 +1,29 @@
 <launch>
-    <!-- Global parameters -->
-    <param name="nao_tts_cache" value="$(find nao_hri)/launch/tts_cache.txt" />
+
+    <!-- Nao ROS drivers -->
     <arg name="nao_ip" default="127.0.0.1"/>
 	<arg name="nao_port" default="9559"/>
 	<env name="PYTHONPATH" value="$(env PYTHONPATH)" />
+    <param name="robot_description" command="$(find xacro)/xacro.py $(find nao_description)/urdf/nao_robot_v3.urdf.xacro" />
 
-    <!-- Nao ROS drivers -->
 	<node pkg="nao_driver" type="nao_sensors.py" name="nao_sensors" required="true" args="--pip=$(arg nao_ip) --pport=$(arg nao_port)" />
 	<node pkg="nao_driver" type="nao_controller.py" name="nao_controller" required="true" args="--pip=$(arg nao_ip) --pport=$(arg nao_port)" />
     <node pkg="nao_driver" type="nao_leds.py" name="nao_leds" args="--pip=$(arg nao_ip) --pport=$(arg nao_port)" />
-	<param name="robot_description" command="$(find xacro)/xacro.py $(find nao_description)/urdf/nao_robot_v3.urdf.xacro" />
+
 	<node pkg="robot_state_publisher" type="state_publisher" name="robot_state_publisher" />
 	<node pkg="nao_description" type="base_footprint" name="base_footprint" />
+
+    <!-- Blender controllers -->
+    <param name="armature_name" value="Armature" />
+    <param name="blender_target_controllers" value="$(find nao_hri)/launch/nao_target_controllers.yaml" />
+
+    <node pkg="ros_blender_bridge" type="run_target_controllers.py" name="blender_target_controllers" output="screen" />
+
+    <node pkg="ros_blender_bridge" type="launch_blender" name="launch_blender" output="screen">
+        <param name="blend_file" value="$(find nao_hri)/launch/nao.blend" />
+        <param name="use_game_engine" value="false" />
+        <param name="python_script" value="$(find ros_blender_bridge)/scripts/run_target_listener.py" />
+    </node>
 
     <!-- Sensors -->
 	<!--<node pkg="openni_tracker" type="openni_tracker" name="openni_tracker" >-->
@@ -27,6 +39,9 @@
 		<!--<param name="input_topic" type="string" value="nao_marker_raw"/>-->
 		<!--<param name="output_topic" type="string" value="nao_marker"/>-->
 	<!--</node>-->
+
+    <!-- Nao HRI Servers -->
+    <param name="nao_tts_cache" value="$(find nao_hri)/launch/tts_cache.txt" />
 
     <!-- Fake people -->
     <node pkg="tf" type="static_transform_publisher" name="base_link_to_map" args="0 0 1 0 0 0 /map /base_link 20" />
