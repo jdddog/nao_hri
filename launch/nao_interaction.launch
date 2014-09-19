@@ -22,7 +22,7 @@
     <node pkg="ros_blender_bridge" type="launch_blender" name="launch_blender" output="screen">
         <param name="blend_file" value="$(find nao_hri)/launch/nao.blend" />
         <param name="use_game_engine" value="false" />
-        <param name="python_script" value="$(find ros_blender_bridge)/scripts/run_target_listener.py" />
+        <param name="python_script" value="$(find ros_blender_bridge)/scripts/run_blender_node.py" />
     </node>
 
     <!-- Sensors -->

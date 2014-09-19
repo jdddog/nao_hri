@@ -43,10 +43,11 @@ class NaoJoint(Joint):
         self.msg.header.stamp = rospy.Time().now()
 
     def set_position(self, position):
-        self.reset_msg()
-        self.msg.joint_angles.append(position)
-        self.msg.speed = self.speed
-        self.joint_pub.publish(self.msg)
+        if position not in self.msg.joint_angles:
+            self.reset_msg()
+            self.msg.joint_angles.append(position)
+            self.msg.speed = self.speed
+            self.joint_pub.publish(self.msg)
 
     def set_speed(self, speed):
         self.speed = speed
