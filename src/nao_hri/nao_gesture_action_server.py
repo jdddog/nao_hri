@@ -27,7 +27,7 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import rospy
-from hri_framework import GestureActionServer
+from hri_framework import IGestureActionServer
 from nao_hri import NaoNode
 from nao_hri import NaoGesture
 from threading import Timer
@@ -41,10 +41,10 @@ class GestureHandle():
         self.timer = timer
 
 
-class NaoGestureActionServer(GestureActionServer, NaoNode):
+class NaoGestureActionServer(IGestureActionServer, NaoNode):
 
     def __init__(self):
-        GestureActionServer.__init__(self, NaoGesture)
+        IGestureActionServer.__init__(self, NaoGesture)
         self.gesture_handle_lookup = {}
         self.motion_proxy = None
 

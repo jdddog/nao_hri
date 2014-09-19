@@ -27,16 +27,16 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 from hri_api.entities import Robot
-from hri_api.entities import Expression, Gesture
+from hri_api.entities import IExpression, IGesture
 import actionlib
 from nao_msgs.msg import BlinkAction, BlinkGoal
 from std_msgs.msg import ColorRGBA
 from nao_hri import AtomicAnimation, RepeatingAnimation
 
 
-class NaoExpression(Expression):
+class NaoExpression(IExpression):
     def __init__(*args):
-        Expression.__init__(*args)
+        IExpression.__init__(*args)
 
     red_eyes = 1
     red_leye = 2
@@ -54,9 +54,9 @@ class NaoExpression(Expression):
     wink_reye = 11
 
 
-class NaoGesture(Gesture):
+class NaoGesture(IGesture):
     def __init__(*args):
-        Gesture.__init__(*args)
+        IGesture.__init__(*args)
 
     larm_down = 1
     rarm_down = 2

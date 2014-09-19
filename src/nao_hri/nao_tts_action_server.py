@@ -30,7 +30,7 @@ import rospy
 import re
 import md5
 from hri_msgs.srv import TextToSpeechSubsentenceDurationResponse
-from hri_framework import TextToSpeechActionServer
+from hri_framework import ITextToSpeechActionServer
 from nao_hri import NaoNode
 import rospkg
 import naoqi
@@ -79,10 +79,10 @@ class TextToSpeechCache():
             self.tts_time_hashes[md5_digest] = word_times
 
 
-class NaoTextToSpeechActionServer(TextToSpeechActionServer, NaoNode):
+class NaoTextToSpeechActionServer(ITextToSpeechActionServer, NaoNode):
 
     def __init__(self):
-        TextToSpeechActionServer.__init__(self)
+        ITextToSpeechActionServer.__init__(self)
         self.tts_cache = TextToSpeechCache()
 
         # Text to speech arguments
@@ -106,7 +106,7 @@ class NaoTextToSpeechActionServer(TextToSpeechActionServer, NaoNode):
             self.tts_proxy = self.get_proxy('ALTextToSpeech')
             self.mem_proxy = self.get_proxy('ALMemory')
             self.subscribe()
-            TextToSpeechActionServer.start(self)
+            ITextToSpeechActionServer.start(self)
         else:
             raise Exception('nao_tts_cache parameter not found')
 
