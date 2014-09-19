@@ -1,0 +1,57 @@
+<launch>
+
+    <!-- Nao ROS drivers -->
+    <arg name="nao_ip" default="127.0.0.1"/>
+	<arg name="nao_port" default="9559"/>
+	<env name="PYTHONPATH" value="$(env PYTHONPATH)" />
+    <param name="robot_description" command="$(find xacro)/xacro.py $(find nao_description)/urdf/nao_robot_v3.urdf.xacro" />
+
+	<node pkg="nao_driver" type="nao_sensors.py" name="nao_sensors" required="true" args="--pip=$(arg nao_ip) --pport=$(arg nao_port)" />
+	<node pkg="nao_driver" type="nao_controller.py" name="nao_controller" required="true" args="--pip=$(arg nao_ip) --pport=$(arg nao_port)" />
+    <node pkg="nao_driver" type="nao_leds.py" name="nao_leds" args="--pip=$(arg nao_ip) --pport=$(arg nao_port)" />
+
+	<node pkg="robot_state_publisher" type="state_publisher" name="robot_state_publisher" />
+	<node pkg="nao_description" type="base_footprint" name="base_footprint" />
+
+    <!-- Blender controllers -->
+    <param name="armature_name" value="Armature" />
+    <param name="blender_target_controllers" value="$(find nao_hri)/launch/nao_target_controllers.yaml" />
+
+    <node pkg="ros_blender_bridge" type="run_target_controllers.py" name="blender_target_controllers" output="screen" />
+
+    <node pkg="ros_blender_bridge" type="launch_blender" name="launch_blender" output="screen">
+        <param name="blend_file" value="$(find nao_hri)/launch/nao.blend" />
+        <param name="use_game_engine" value="false" />
+        <param name="python_script" value="$(find ros_blender_bridge)/scripts/run_blender_node.py" />
+    </node>
+
+    <!-- Sensors -->
+	<!--<node pkg="openni_tracker" type="openni_tracker" name="openni_tracker" >-->
+		<!--<param name="camera_frame_id" value="camera_depth_frame"/>-->
+		<!--<param name="smoothing" value="0.7"/>-->
+		<!--<param name="num_users" value="2"/>-->
+	<!--</node>-->
+
+    <!--<node pkg="tf" type="static_transform_publisher" name="nao_to_kinect_transform" args="-0.045 -0.00 -0.04 0.03 1.1 0.0 1.0 nao_marker base_link 10" />-->
+
+	<!--<node name="nao_marker_smoother" pkg="hri_api" type="smoother.py" output="screen">-->
+		<!--<param name="rate" type="int" value="20"/>-->
+		<!--<param name="input_topic" type="string" value="nao_marker_raw"/>-->
+		<!--<param name="output_topic" type="string" value="nao_marker"/>-->
+	<!--</node>-->
+
+    <!-- Nao HRI Servers -->
+    <param name="nao_tts_cache" value="$(find nao_hri)/launch/tts_cache.txt" />
+
+    <!-- Fake people -->
+    <node pkg="tf" type="static_transform_publisher" name="base_link_to_map" args="0 0 1 0 0 0 /map /base_link 20" />
+
+    <node pkg="tf" type="static_transform_publisher" name="person1_head" args="2 2 1.9 0 0 0 /map /person1_head 20" />
+    <node pkg="tf" type="static_transform_publisher" name="person1_torso" args="2 2 1 0 0 0 /map /person1_torso 20" />
+
+    <node pkg="tf" type="static_transform_publisher" name="person2_head" args="2 0.3 1.76 0 0 0 /map /person2_head 20" />
+    <node pkg="tf" type="static_transform_publisher" name="person2_torso" args="2 0.3 1.16 0 0 0 /map /person2_torso 20" />
+
+    <node pkg="tf" type="static_transform_publisher" name="person3_head" args="1 -1 1.5 0 0 0 /map /person3_head 20" />
+    <node pkg="tf" type="static_transform_publisher" name="person3_torso" args="1 -1 0.9 0 0 0 /map /person3_torso 20" />
+</launch>

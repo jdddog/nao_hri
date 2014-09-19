@@ -1,0 +1,60 @@
+
+nao_gaze_controller:
+  default_speed: 0.5
+  default_acceleration: 0.1
+  target_bone: gaze_target
+  target_topic: gaze_target
+  frame_id: torso
+  joints:
+    HeadYaw:
+      module: nao_hri
+      class: NaoJoint
+    HeadPitch:
+      module: nao_hri
+      class: NaoJoint
+
+nao_larm_controller:
+  default_speed: 0.5
+  default_acceleration: 0.1
+  target_bone: l_gripper_target
+  target_topic: l_gripper_target
+  frame_id: torso
+  joints:
+    LShoulderPitch:
+      module: nao_hri
+      class: NaoJoint
+    LShoulderRoll:
+      module: nao_hri
+      class: NaoJoint
+    LElbowYaw:
+      module: nao_hri
+      class: NaoJoint
+    LElbowRoll:
+      module: nao_hri
+      class: NaoJoint
+    LWristYaw:
+      module: nao_hri
+      class: NaoJoint
+
+nao_rarm_controller:
+  default_speed: 0.5
+  default_acceleration: 0.1
+  target_bone: r_gripper_target
+  target_topic: r_gripper_target
+  frame_id: torso
+  joints:
+    RShoulderPitch:
+      module: nao_hri
+      class: NaoJoint
+    RShoulderRoll:
+      module: nao_hri
+      class: NaoJoint
+    RElbowYaw:
+      module: nao_hri
+      class: NaoJoint
+    RElbowRoll:
+      module: nao_hri
+      class: NaoJoint
+    RWristYaw:
+      module: nao_hri
+      class: NaoJoint
