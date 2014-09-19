@@ -29,7 +29,7 @@
 import rospy
 from hri_framework import IGestureActionServer
 from nao_hri import NaoNode
-from nao_hri import NaoGesture
+from nao_hri import Gesture
 from threading import Timer
 
 
@@ -44,7 +44,7 @@ class GestureHandle():
 class NaoGestureActionServer(IGestureActionServer, NaoNode):
 
     def __init__(self):
-        IGestureActionServer.__init__(self, NaoGesture)
+        IGestureActionServer.__init__(self, Gesture)
         self.gesture_handle_lookup = {}
         self.motion_proxy = None
 
@@ -57,9 +57,9 @@ class NaoGestureActionServer(IGestureActionServer, NaoNode):
         goal = goal_handle.get_goal()
 
         if self.has_gesture(goal.gesture):
-            gesture = NaoGesture[goal.gesture]
+            gesture = Gesture[goal.gesture]
 
-            animations = NaoGesture.get_keyframe_animations(gesture)
+            animations = Gesture.get_keyframe_animations(gesture)
             names = []
             times = []
             keys = []

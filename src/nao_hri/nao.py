@@ -34,45 +34,71 @@ from std_msgs.msg import ColorRGBA
 from nao_hri import AtomicAnimation, RepeatingAnimation
 
 
-class NaoExpression(IExpression):
+class Expression(IExpression):
     def __init__(*args):
         IExpression.__init__(*args)
 
-    red_eyes = 1
-    red_leye = 2
-    red_reye = 3
+    RedEyes = 1
+    RedLeye = 2
+    RedReye = 3
 
-    blue_eyes = 4
-    blue_leye = 5
-    blue_reye = 6
+    BlueEyes = 4
+    BlueLeye = 5
+    BlueReye = 6
 
-    green_eyes = 7
-    green_leye = 8
-    green_reye = 9
+    GreenEyes = 7
+    GreenLeye = 8
+    GreenReye = 9
 
-    wink_leye = 10
-    wink_reye = 11
+    WinkLeye = 10
+    WinkReye = 11
+
+    def default_speed(self):
+        expression_data = self.get_data()
+        return expression_data[1]
+
+    def default_intensity(self):
+        expression_data = self.get_data()
+        return expression_data[2]
+
+    def default_duration(self):
+        expression_data = self.get_data()
+        return expression_data[3]
 
 
-class NaoGesture(IGesture):
-    def __init__(*args):
+class Gesture(IGesture):
+    def __init__(self, *args):
         IGesture.__init__(*args)
 
-    larm_down = 1
-    rarm_down = 2
-    wave_larm = 3
-    motion_right = 4
-    motion_left = 5
-    hands_on_hips = 6
+        self.data = [(Gesture.LarmDown, 2.0),
+            (Gesture.RarmDown, 2.0),
+            (Gesture.WaveLarm, 6.0),
+            (Gesture.MotionRight, 2.0),
+            (Gesture.MotionLeft, 2.0),
+            (Gesture.HandsOnHips, 3.0),
+            (Gesture.PointLarm, None),
+            (Gesture.PointRarm, None)]
 
-    @staticmethod
-    def get_keyframe_animations(gesture):
+    LarmDown = 1
+    RarmDown = 2
+    WaveLarm = 3
+    MotionRight = 4
+    MotionLeft = 5
+    HandsOnHips = 6
+    PointLarm = 7
+    PointRarm = 8
+
+    def default_duration(self):
+        gesture_data = self.get_data()
+        return gesture_data[1]
+
+    def get_keyframe_animations(self):
         names = []
         times = []
         keys = []
         animations = []
 
-        if gesture is NaoGesture.larm_down:
+        if self is Gesture.LarmDown:
             names.append("LElbowRoll")
             times.append([ 0.80000])
             keys.append([ [ -0.42242, [ 3, -0.26667, 0.00000], [ 3, 0.00000, 0.00000]]])
@@ -97,9 +123,9 @@ class NaoGesture(IGesture):
             times.append([ 0.90000])
             keys.append([ [ 0.11491, [ 3, -0.26667, 0.00000], [ 3, 0.00000, 0.00000]]])
 
-            animations.append(AtomicAnimation(names, times, keys, 0.5, 4.0))
+            animations.append(AtomicAnimation(names, times, keys))
 
-        elif gesture is NaoGesture.rarm_down:
+        elif self is Gesture.RarmDown:
             names.append("RElbowRoll")
             times.append([ 0.80000])
             keys.append([ [ 0.42506, [ 3, -0.26667, 0.00000], [ 3, 0.00000, 0.00000]]])
@@ -124,9 +150,9 @@ class NaoGesture(IGesture):
             times.append([ 0.80000])
             keys.append([ [ 0.09794, [ 3, -0.26667, 0.00000], [ 3, 0.00000, 0.00000]]])
 
-            animations.append(AtomicAnimation(names, times, keys, 0.5, 4.0))
+            animations.append(AtomicAnimation(names, times, keys))
 
-        elif gesture is NaoGesture.wave_larm:
+        elif self is Gesture.WaveLarm:
             names.append("LElbowRoll")
             times.append([ 0.60000, 1.20000])
             keys.append([ [ -1.36982, [ 3, -0.20000, 0.00000], [ 3, 0.20000, 0.00000]], [ -1.54930, [ 3, -0.20000, 0.00000], [ 3, 0.00000, 0.00000]]])
@@ -158,12 +184,12 @@ class NaoGesture(IGesture):
             times.append([ 0.60000, 1.20000])
             keys.append([ [ 1.0, [ 3, -0.20000, 0.00000], [ 3, 0.20000, 0.00000]], [ 1.0, [ 3, -0.20000, 0.00000], [ 3, 0.00000, 0.00000]]])
 
-            open_fingers = AtomicAnimation(names, times, keys, open_finger_duration, open_finger_duration)
+            open_fingers = AtomicAnimation(names, times, keys, override_time=open_finger_duration)
 
             animations.append(oscilate_arm)
             animations.append(open_fingers)
 
-        elif gesture is NaoGesture.motion_right:
+        elif self is Gesture.MotionRight:
 
             names.append("RElbowRoll")
             times.append([ 0.64000])
@@ -189,9 +215,9 @@ class NaoGesture(IGesture):
             times.append([ 0.64000])
             keys.append([ [ -0.61057, [ 3, -0.21333, 0.00000], [ 3, 0.00000, 0.00000]]])
 
-            animations.append(AtomicAnimation(names, times, keys, 0.6, 2.0))
+            animations.append(AtomicAnimation(names, times, keys))
 
-        elif gesture is NaoGesture.motion_left:
+        elif self is Gesture.MotionLeft:
             names.append("LElbowRoll")
             times.append([ 1.24000])
             keys.append([ [ -0.49544, [ 3, -0.41333, 0.00000], [ 3, 0.00000, 0.00000]]])
@@ -216,9 +242,9 @@ class NaoGesture(IGesture):
             times.append([ 1.24000])
             keys.append([ [ 0.10887, [ 3, -0.41333, 0.00000], [ 3, 0.00000, 0.00000]]])
 
-            animations.append(AtomicAnimation(names, times, keys, 0.6, 2.0))
+            animations.append(AtomicAnimation(names, times, keys))
 
-        elif gesture is NaoGesture.hands_on_hips:
+        elif self is Gesture.HandsOnHips:
             names.append("LElbowRoll")
             times.append([ 1.00000, 2.08000])
             keys.append([ [ -0.74702, [ 3, -0.33333, 0.00000], [ 3, 0.36000, 0.00000]], [ -1.49101, [ 3, -0.36000, 0.00000], [ 3, 0.00000, 0.00000]]])
@@ -267,7 +293,7 @@ class NaoGesture(IGesture):
             times.append([ 1.00000, 2.08000])
             keys.append([ [ 0.05518, [ 3, -0.33333, 0.00000], [ 3, 0.36000, 0.00000]], [ 0.03217, [ 3, -0.36000, 0.00000], [ 3, 0.00000, 0.00000]]])
 
-            animations.append(AtomicAnimation(names, times, keys, 0.7, 1.2))
+            animations.append(AtomicAnimation(names, times, keys))
 
         return animations
 
@@ -275,7 +301,7 @@ class NaoGesture(IGesture):
 class Nao(Robot):
 
     def __init__(self):
-        Robot.__init__(self, NaoExpression, NaoGesture)
+        Robot.__init__(self, Expression, Gesture)
         self.blink_client = actionlib.SimpleActionClient('blink', BlinkAction)
         self.wait_for_action_servers(self.blink_client)
 

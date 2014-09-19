@@ -27,38 +27,14 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
+from hri_api.entities import World, Person
+from nao_hri import Nao
 
-from hri_api.entities import Person, World, Saliency
-from hri_api.query import Query
-from nao_hri.nao import Nao, NaoExpression, NaoGesture
-import random
-
-# Initialize World, Nao and People (their coordinates are specified in the launch file)
 world = World()
-robot = Nao()   # Initialize Nao robot
+robot = Nao()
 people = [Person(1), Person(2), Person(3)]
-utterances = ["Why are you looking at me?",
-              "Are you pregnant?",
-              "What's going on in that head of yours?",
-              "Do you think I'm rude?"]
 
-# Make nao gaze at each person
+# Gaze at each person's head
 for person in people:
-    robot.gaze_and_wait(person.head, speed=0.5)
+    robot.gaze_and_wait(person.head)
 
-# Change Nao's eye color
-# robot.expression(NaoExpression.red_leye)
-# robot.expression(NaoExpression.green_reye)
-
-# Make Nao speak and gesture to audience of people
-robot.say_to("Hello my name is Nao!", people)
-
-# Say random things and point at peoples heads
-for person in people:
-    text = "<{point} target={target}> {utterance} <{point}/>".format(point=NaoGesture.point_larm,
-                                                                     utterance=random.choice(utterances),
-                                                                     target=person.head)
-    robot.say_to_and_wait(text, person)
-    robot.wait_for_period(5.0)
-
-robot.say_to("Goodbye!", people)

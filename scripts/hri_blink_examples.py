@@ -30,7 +30,7 @@
 
 from hri_api.entities import Person, World, Saliency
 from hri_api.query import Query
-from nao_hri.nao import Nao, NaoExpression, NaoGesture
+from nao_hri.nao import Nao, Expression, Gesture
 import random
 
 world = World()
