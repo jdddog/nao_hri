@@ -30,7 +30,7 @@
 
 from hri_api.entities import Person, World, Saliency
 from hri_api.query import Query
-from nao_hri.nao import Nao, NaoExpression, NaoGesture
+from nao_hri.nao import Nao, Expression, Gesture
 import random
 
 # Initialize World, Nao and People (their coordinates are specified in the launch file)
@@ -55,7 +55,7 @@ robot.say_to("Hello my name is Nao!", people)
 
 # Say random things and point at peoples heads
 for person in people:
-    text = "<{point} target={target}> {utterance} <{point}/>".format(point=NaoGesture.point_larm,
+    text = "<{point} target={target}> {utterance} <{point}/>".format(point=Gesture.point_larm,
                                                                      utterance=random.choice(utterances),
                                                                      target=person.head)
     robot.say_to_and_wait(text, person)

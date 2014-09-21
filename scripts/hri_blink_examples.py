@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # Copyright (c) 2014, James Diprose
 # All rights reserved.
 #
@@ -30,7 +31,7 @@
 
 from hri_api.entities import Person, World, Saliency
 from hri_api.query import Query
-from nao_hri.nao import Nao, NaoExpression, NaoGesture
+from nao_hri.nao import Nao, Expression, Gesture
 import random
 
 world = World()

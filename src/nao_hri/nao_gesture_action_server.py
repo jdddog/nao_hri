@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # Copyright (c) 2014, James Diprose
 # All rights reserved.
 #
@@ -27,78 +28,145 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import rospy
+import actionlib
 from hri_framework import IGestureActionServer
-from nao_hri import NaoNode
-from nao_hri import NaoGesture
-from threading import Timer
+from nao_hri import NaoNode, Gesture
+from hri_msgs.msg import TargetAction, TargetGoal
+from threading import Timer, RLock
 
 
 class GestureHandle():
-    def __init__(self, goal_handle, motion_id, timer):
+    def __init__(self, goal_handle, gesture, motion_id=None, client=None):
         self.goal_id = goal_handle.get_goal_id().id
+        self.gesture = gesture
         self.goal_handle = goal_handle
+        self.timer = None
         self.motion_id = motion_id
-        self.timer = timer
+        self.client = client
 
+    def start_timer(self, duration, callback, *args):
+        self.timer = Timer(duration, callback, *args)
+        self.timer.start()
+
+    def stop_timer(self):
+        if self.timer is not None:
+            self.timer.cancel()
 
 class NaoGestureActionServer(IGestureActionServer, NaoNode):
 
     def __init__(self):
-        IGestureActionServer.__init__(self, NaoGesture)
-        self.gesture_handle_lookup = {}
+        IGestureActionServer.__init__(self, Gesture)
         self.motion_proxy = None
+        self.lock = RLock()
+
+        self.larm_client = actionlib.SimpleActionClient('nao_point_left', TargetAction)
+        self.larm_gh = None
+
+        self.rarm_client = actionlib.SimpleActionClient('nao_point_right', TargetAction)
+        self.rarm_gh = None
 
     def start(self):
         NaoNode.__init__(self, self.get_instance_name())
         self.motion_proxy = self.get_proxy('ALMotion')
         super(NaoGestureActionServer, self).start()
 
+    def is_keyframe_animation(self, gesture):
+        if gesture in [Gesture.LarmDown, Gesture.RarmDown, Gesture.MotionRight, Gesture.MotionLeft, Gesture.WaveLarm]:
+            return True
+        return False
+
     def start_gesture(self, goal_handle):
-        goal = goal_handle.get_goal()
+        with self.lock:
+            goal = goal_handle.get_goal()
 
-        if self.has_gesture(goal.gesture):
-            gesture = NaoGesture[goal.gesture]
+            if self.is_valid_gesture(goal.gesture):
+                gesture = Gesture[goal.gesture]
 
-            animations = NaoGesture.get_keyframe_animations(gesture)
-            names = []
-            times = []
-            keys = []
+                if goal.duration is None:
+                    duration = gesture.default_duration()
+                else:
+                    duration = goal.duration
 
-            for a in animations:
-                (n_temp, t_temp, k_temp) = a.get_ntk(goal.duration)
-                names += n_temp
-                times += t_temp
-                keys += k_temp
+                if self.is_keyframe_animation(gesture):
+                    animations = gesture.keyframe_animations()
+                    names = []
+                    times = []
+                    keys = []
 
-            motion_id = self.motion_proxy.post.angleInterpolationBezier(names, times, keys)
-            timer = Timer(goal.duration, self.gesture_finished, [goal_handle])
-            gesture_handle = GestureHandle(goal_handle, motion_id, timer)
-            self.add_gesture_handle(gesture_handle)
-            timer.start()
+                    for a in animations:
+                        (n_temp, t_temp, k_temp) = a.get_ntk(duration)
+                        names += n_temp
+                        times += t_temp
+                        keys += k_temp
 
-        else:
-            self.action_server.set_aborted(goal_handle)
+                    motion_id = self.motion_proxy.post.angleInterpolationBezier(names, times, keys)
+                    gesture_handle = GestureHandle(goal_handle, gesture, motion_id=motion_id)
+                    self.add_gesture_handle(gesture_handle)
+                    gesture_handle.start_timer(duration, self.set_succeeded, goal_handle)
+
+                else:
+                    target_goal = TargetGoal()
+                    target_goal.target = goal.target
+                    target_goal.speed = 0.5
+                    target_goal.acceleration = 0.3
+
+                    if gesture is Gesture.PointLarm:
+                        self.larm_gh = goal_handle
+                        client = self.larm_client
+                        done_cb = self.larm_succeeded
+                    elif gesture is Gesture.PointRarm:
+                        self.rarm_gh = goal_handle
+                        client = self.rarm_client
+                        done_cb = self.rarm_succeeded
+
+                    gesture_handle = GestureHandle(goal_handle, gesture, client=client)
+                    self.add_gesture_handle(gesture_handle)
+
+                    if goal.duration is None:
+                        client.send_goal(target_goal, done_cb=done_cb)
+                    else:
+                        client.send_goal(target_goal)
+                        gesture_handle.start_timer(duration, self.set_succeeded, goal_handle)
+            else:
+                self.set_aborted(goal_handle)
+
+    def larm_succeeded(self):
+        with self.lock:
+            gesture_handle = self.get_gesture_handle(self.larm_gh)
+            self.set_succeeded(self.larm_gh)
+            self.larm_gh = None
+            self.remove_gesture_handle(gesture_handle)
+
+    def rarm_succeeded(self):
+        with self.lock:
+            gesture_handle = self.get_gesture_handle(self.rarm_gh)
+            self.set_succeeded(self.rarm_gh)
+            self.rarm_gh = None
+            self.remove_gesture_handle(gesture_handle)
+
+    def larm_cancelled(self):
+        with self.lock:
+            self.cancel_gesture(self.larm_gh)
+            self.larm_gh = None
+
+    def rarm_cancelled(self):
+        with self.lock:
+            self.cancel_gesture(self.rarm_gh)
+            self.rarm_gh = None
 
     def cancel_gesture(self, goal_handle):
-        gesture_handle = self.get_gesture_handle(goal_handle)
-        gesture_handle.timer.cancel()
-        self.motion_proxy.stop(gesture_handle.motion_id)
-        self.remove_gesture_handle(goal_handle)
+        with self.lock:
+            gesture_handle = self.get_gesture_handle(goal_handle)
+            gesture_handle.stop_timer()
 
-    def gesture_finished(self, goal_handle):
-        super(NaoGestureActionServer, self).gesture_finished(goal_handle)
-        self.remove_gesture_handle(goal_handle)
+            if self.is_keyframe_animation(gesture_handle.gesture):
+                self.motion_proxy.stop(gesture_handle.motion_id)
+            else:
+                gesture_handle.client.cancel_goal()
 
-    def get_gesture_handle(self, goal_handle):
-        return self.gesture_handle_lookup[goal_handle.get_goal_id().id]
+            self.remove_gesture_handle(gesture_handle)
 
-    def add_gesture_handle(self, gesture_handle):
-        self.gesture_handle_lookup[gesture_handle.goal_id] = gesture_handle
-
-    def remove_gesture_handle(self, goal_handle):
-        self.gesture_handle_lookup.pop(goal_handle.get_goal_id().id)
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     rospy.init_node('gesture_action_server')
     gesture_server = NaoGestureActionServer()
     gesture_server.start()

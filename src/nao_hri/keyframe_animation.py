@@ -94,10 +94,9 @@ class KeyframeAnimation():
 
 class AtomicAnimation(KeyframeAnimation):
 
-    def __init__(self, names, times, keys, min_time, max_time):
+    def __init__(self, names, times, keys, override_time=None):
         KeyframeAnimation.__init__(self, names, times, keys)
-        self.min_time = min_time
-        self.max_time = max_time
+        self.override_time = override_time
 
     '''
         Desired time in seconds
@@ -125,7 +124,11 @@ class AtomicAnimation(KeyframeAnimation):
         return single_frame and same_values
 
     def get_ntk(self, desired_time):
-        desired_time = limit(desired_time, self.min_time, self.max_time)
+        if self.override_time is None:
+            desired_time = min_limit(desired_time, 0.1)
+        else:
+            desired_time = self.override_time
+
         start_time = self.get_start_time()
         end_time = self.get_end_time()
         new_animation_times = []

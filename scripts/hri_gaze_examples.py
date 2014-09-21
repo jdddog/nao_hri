@@ -29,19 +29,13 @@
 
 
 from hri_api.entities import World, Person
-from nao_hri import Nao, Gesture
+from nao_hri import Nao
 
 world = World()
 robot = Nao()
-person = Person(1)
+people = [Person(1), Person(2), Person(3)]
 
-robot.gesture_and_wait(Gesture.HandsOnHips)
-robot.gesture_and_wait(Gesture.MotionLeft)
-robot.gesture_and_wait(Gesture.MotionRight)
-robot.gesture_and_wait(Gesture.WaveLarm)
+# Gaze at each person's head
+for person in people:
+    robot.gaze_and_wait(person.head)
 
-robot.gesture_and_wait(Gesture.PointLarm, target=person.head)
-robot.gesture_and_wait(Gesture.PointRarm, target=person.torso)
-
-robot.gesture_and_wait(Gesture.LarmDown)
-robot.gesture_and_wait(Gesture.RarmDown)
