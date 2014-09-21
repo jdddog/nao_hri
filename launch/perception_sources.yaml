@@ -1,0 +1,49 @@
+
+people_source:
+  source_type: HierarchicalEntityListSource
+  topic: users_list
+  module: openni_tracker.msg
+  class: UserList
+  attribute: users
+  entity_type: person
+  local_id_attr: user_id
+  children:
+    - type: head
+      pose_attr: head
+    - type: neck
+      pose_attr: neck
+    - type: torso
+      pose_attr: torso
+    - type: left_shoulder
+      pose_attr: left_shoulder
+    - type: left_elbow
+      pose_attr: left_elbow
+    - type: left_hand
+      pose_attr: left_hand
+    - type: right_shoulder
+      pose_attr: right_shoulder
+    - type: right_elbow
+      pose_attr: right_elbow
+    - type: right_hand
+      pose_attr: right_hand
+    - type: left_hip
+      pose_attr: left_hip
+    - type: left_knee
+      pose_attr: left_knee
+    - type: left_foot
+      pose_attr: left_foot
+    - type: right_hip
+      pose_attr: right_hip
+    - type: right_knee
+      pose_attr: right_knee
+    - type: right_foot
+      pose_attr: right_foot
+
+#saliency_source:
+#  source_type: EntitySource
+#  topic: salient_point3d
+#  module: geometry_msgs
+#  class: PoseStamped
+#  entity:
+#    type: 'saliency'
+

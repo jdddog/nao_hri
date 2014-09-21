@@ -67,18 +67,6 @@ class Expression(IExpression):
 
 
 class Gesture(IGesture):
-    def __init__(self, *args):
-        IGesture.__init__(*args)
-
-        self.data = [(Gesture.LarmDown, 2.0),
-            (Gesture.RarmDown, 2.0),
-            (Gesture.WaveLarm, 6.0),
-            (Gesture.MotionRight, 2.0),
-            (Gesture.MotionLeft, 2.0),
-            (Gesture.HandsOnHips, 3.0),
-            (Gesture.PointLarm, None),
-            (Gesture.PointRarm, None)]
-
     LarmDown = 1
     RarmDown = 2
     WaveLarm = 3
@@ -88,11 +76,22 @@ class Gesture(IGesture):
     PointLarm = 7
     PointRarm = 8
 
+    def __init__(self, *args):
+        IGesture.__init__(*args)
+        # self.data = [(self.LarmDown, 2.0),
+        #     (self.RarmDown, 2.0),
+        #     (self.WaveLarm, 6.0),
+        #     (self.MotionRight, 2.0),
+        #     (self.MotionLeft, 2.0),
+        #     (self.HandsOnHips, 3.0),
+        #     (self.PointLarm, None),
+        #     (self.PointRarm, None)]
+
     def default_duration(self):
         gesture_data = self.get_data()
         return gesture_data[1]
 
-    def get_keyframe_animations(self):
+    def keyframe_animations(self):
         names = []
         times = []
         keys = []

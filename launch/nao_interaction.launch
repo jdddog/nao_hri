@@ -42,6 +42,34 @@
 
     <!-- Nao HRI Servers -->
     <param name="nao_tts_cache" value="$(find nao_hri)/launch/tts_cache.txt" />
+    <node pkg="nao_hri" type="nao_gesture_action_server.py" name="nao_gesture_action_server" output="screen" />
+    <node pkg="nao_hri" type="nao_tts_action_server.py" name="nao_tts_action_server" output="screen" />
+
+    <node pkg="nao_hri" type="blender_target_server.py" name="nao_gaze_action_server" output="screen">
+        <param name="action_server_name" value="gaze" />
+        <param name="controller_name" value="nao_gaze_controller" />
+        <param name="end_effector_name" value="gaze" />
+        <param name="target_name" value="gaze_target" />
+    </node>
+
+    <node pkg="nao_hri" type="blender_target_server.py" name="nao_point_left_server" output="screen">
+        <param name="action_server_name" value="nao_point_left" />
+        <param name="controller_name" value="nao_larm_controller" />
+        <param name="end_effector_name" value="l_gripper" />
+        <param name="target_name" value="l_gripper_target" />
+    </node>
+
+    <node pkg="nao_hri" type="blender_target_server.py" name="nao_point_right_server" output="screen">
+        <param name="action_server_name" value="nao_point_right" />
+        <param name="controller_name" value="nao_rarm_controller" />
+        <param name="end_effector_name" value="r_gripper" />
+        <param name="target_name" value="r_gripper_target" />
+    </node>
+
+
+    <node pkg="hri_framework" type="perception_synthesiser.py" name="perception_synthesiser" output="screen">
+        <param name="perception_sources_yaml" value="$(find nao_hri)/launch/perception_sources.yaml" />
+    </node>
 
     <!-- Fake people -->
     <node pkg="tf" type="static_transform_publisher" name="base_link_to_map" args="0 0 1 0 0 0 /map /base_link 20" />
