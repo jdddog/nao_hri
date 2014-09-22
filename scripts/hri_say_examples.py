@@ -33,6 +33,6 @@ from nao_hri import Nao
 
 robot = Nao()
 
-robot.say_and_wait('Hello')
-robot.say_and_wait('Im a crazy robot')
+robot.say_and_wait("Hello")
+robot.say_and_wait("I'm a crazy robot")
 

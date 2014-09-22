@@ -102,8 +102,8 @@ class NaoTextToSpeechActionServer(ITextToSpeechActionServer, NaoNode):
         if rospy.has_param("nao_tts_cache"):
             path = rospy.get_param("nao_tts_cache")
             self.tts_cache.load_tts_cache(path)
-
-            NaoNode.__init__(self, self.get_instance_name())
+            module_name = self.get_instance_name(globals())
+            NaoNode.__init__(self, module_name)
             self.tts_proxy = self.get_proxy('ALTextToSpeech')
             self.mem_proxy = self.get_proxy('ALMemory')
             self.subscribe()
@@ -190,6 +190,8 @@ class NaoTextToSpeechActionServer(ITextToSpeechActionServer, NaoNode):
         self.mem_proxy.unsubscribeToEvent("ALTextToSpeech/CurrentWord", self.module_name)
         self.tts_proxy.disableNotifications()
         rospy.loginfo("Un-subscribed from ALTextToSpeech events.")
+
+
 
 if __name__ == '__main__':
     rospy.init_node('tts_action_server')

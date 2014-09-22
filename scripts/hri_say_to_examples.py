@@ -30,15 +30,25 @@
 
 from hri_api.entities import World, Person
 from nao_hri import Nao, Gesture
+from hri_api.query import Query
 
 
 world = World()
 robot = Nao()
-person = Person(1)
-
-robot.say_to_and_wait('hello who are you?', person)
+people = Query([Person(1), Person(2), Person(3)])
 
 
+#TODO: allow lists to be passed
 
+robot.say_to_and_wait('hello who are you?', people)
+#robot.say_to_and_wait('Its hazards are hostile to us all. '
+                      # 'Its conquest deserves the best of all '
+                      # 'mankind, and its opportunity for peaceful '
+                      # 'cooperation may never come again. But why, some say, the moon? '
+                      # 'Why choose this as our goal? And they may well ask why climb the highest mountain? '
+                      # 'Why, 35 years ago, fly the Atlantic?', people)
+
+person = people.execute()[0]
+robot.say_to_and_wait("<PointLarm target='{0}'> no its not your turn David Cunliffe! </PointLarm>".format(person.head), person)
 
 

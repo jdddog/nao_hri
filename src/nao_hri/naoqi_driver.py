@@ -136,11 +136,13 @@ class NaoNode(ALModule):
     #   as a string.
     #
     #   Hence, this method finds it for you automatically (if its in the same file)
+    #
+    #   pass it globals() from the outer scope
 
-    def get_instance_name(self):
+    def get_instance_name(self, global_variables):
         instance_name = ''
 
-        for k, v in list(globals().iteritems()):
+        for k, v in list(global_variables.iteritems()):
             if v is self:
                 instance_name = k
 

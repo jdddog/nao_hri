@@ -31,7 +31,6 @@ __author__ = 'Jamie Diprose'
 
 
 import rospy
-from hri_msgs.msg import GazeAction, GazeActionFeedback
 from hri_framework import ITargetActionServer
 from geometry_msgs.msg import PointStamped, Point
 from std_srvs.srv import Empty
@@ -59,7 +58,6 @@ def interpolate(value, old_min, old_max, new_min, new_max):
 
 class BlenderTargetServer(ITargetActionServer):
 
-    MIN_SUCCEEDED_DISTANCE = 0.1
     MIN_ITERATIONS_STOPPED = 5
 
     def __init__(self):
@@ -69,6 +67,7 @@ class BlenderTargetServer(ITargetActionServer):
         self.tl = tf.TransformListener()
         self.controller_name = rospy.get_param('~controller_name')
         self.target_name = rospy.get_param('~target_name')
+        self.axes = rospy.get_param('~axes')
         self.joints_stopped = False
 
         self.gaze_target_pub = rospy.Publisher(self.controller_name + '/' + self.target_name, PointStamped, queue_size=1)
@@ -81,6 +80,16 @@ class BlenderTargetServer(ITargetActionServer):
 
     def joints_stopped_callback(self, msg):
         self.joints_stopped = True
+
+    def get_axis_index(self, name):
+        if name == 'x':
+            return 0
+        elif name == 'y':
+            return 1
+        elif name == 'z':
+            return 2
+        else:
+            raise Exception('not a valid axis name: {0}'.format(name))
 
     def execute(self, gaze_goal):
         self.enable_srv()
@@ -109,14 +118,22 @@ class BlenderTargetServer(ITargetActionServer):
                     count += 1
 
                 (curr_trans, curr_rot) = self.tl.lookupTransform(self.end_effector_frame, entity_tf_frame, rospy.Time(0))
-                y = curr_trans[1]
-                z = curr_trans[2]
+
+                i = self.get_axis_index(self.axes[0])
+                j = self.get_axis_index(self.axes[1])
+
+                y = curr_trans[i]
+                z = curr_trans[j]
                 distance_to_target = sqrt(y*y + z*z)
                 rospy.loginfo('gaze_frame: {0}, entity_tf_frame: {1}, y: {2}, z: {3}, distance: {4}'.format(self.end_effector_frame, entity_tf_frame, y, z, distance_to_target))
                 self.send_feedback(distance_to_target)
 
-                if distance_to_target < BlenderTargetServer.MIN_SUCCEEDED_DISTANCE or (self.joints_stopped and count < BlenderTargetServer.MIN_ITERATIONS_STOPPED):
+                print("STOPPED: " + str(self.joints_stopped))
+
+                if distance_to_target < self.success_distance or (self.joints_stopped and count < BlenderTargetServer.MIN_ITERATIONS_STOPPED):
                     self.action_server.set_succeeded()
+                    print("SUCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCEEEEEEEEEEEEEEEEEEEEEEEDDDDDDDDDDDDDEEEEEEEEEEEEEEEEEEDDDDDDDDDDDDDDDDDDDDd")
+                    break
 
             except (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException):
                 continue

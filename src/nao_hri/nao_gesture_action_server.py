@@ -33,6 +33,7 @@ from hri_framework import IGestureActionServer
 from nao_hri import NaoNode, Gesture
 from hri_msgs.msg import TargetAction, TargetGoal
 from threading import Timer, RLock
+from nao_hri import AnimationType
 
 
 class GestureHandle():
@@ -44,13 +45,14 @@ class GestureHandle():
         self.motion_id = motion_id
         self.client = client
 
-    def start_timer(self, duration, callback, *args):
-        self.timer = Timer(duration, callback, *args)
+    def start_timer(self, duration, callback, args):
+        self.timer = Timer(duration, callback, args)
         self.timer.start()
 
     def stop_timer(self):
         if self.timer is not None:
             self.timer.cancel()
+
 
 class NaoGestureActionServer(IGestureActionServer, NaoNode):
 
@@ -66,14 +68,10 @@ class NaoGestureActionServer(IGestureActionServer, NaoNode):
         self.rarm_gh = None
 
     def start(self):
-        NaoNode.__init__(self, self.get_instance_name())
+        module_name = self.get_instance_name(globals())
+        NaoNode.__init__(self, module_name)
         self.motion_proxy = self.get_proxy('ALMotion')
         super(NaoGestureActionServer, self).start()
-
-    def is_keyframe_animation(self, gesture):
-        if gesture in [Gesture.LarmDown, Gesture.RarmDown, Gesture.MotionRight, Gesture.MotionLeft, Gesture.WaveLarm]:
-            return True
-        return False
 
     def start_gesture(self, goal_handle):
         with self.lock:
@@ -82,12 +80,12 @@ class NaoGestureActionServer(IGestureActionServer, NaoNode):
             if self.is_valid_gesture(goal.gesture):
                 gesture = Gesture[goal.gesture]
 
-                if goal.duration is None:
-                    duration = gesture.default_duration()
+                if goal.duration == -1:
+                    duration = gesture.default_duration
                 else:
                     duration = goal.duration
 
-                if self.is_keyframe_animation(gesture):
+                if gesture.animation_type is AnimationType.Keyframe:
                     animations = gesture.keyframe_animations()
                     names = []
                     times = []
@@ -102,7 +100,7 @@ class NaoGestureActionServer(IGestureActionServer, NaoNode):
                     motion_id = self.motion_proxy.post.angleInterpolationBezier(names, times, keys)
                     gesture_handle = GestureHandle(goal_handle, gesture, motion_id=motion_id)
                     self.add_gesture_handle(gesture_handle)
-                    gesture_handle.start_timer(duration, self.set_succeeded, goal_handle)
+                    gesture_handle.start_timer(duration, self.set_succeeded, [goal_handle])
 
                 else:
                     target_goal = TargetGoal()
@@ -111,22 +109,32 @@ class NaoGestureActionServer(IGestureActionServer, NaoNode):
                     target_goal.acceleration = 0.3
 
                     if gesture is Gesture.PointLarm:
-                        self.larm_gh = goal_handle
-                        client = self.larm_client
-                        done_cb = self.larm_succeeded
+                        if self.larm_gh is None:
+                            self.larm_gh = goal_handle
+                            client = self.larm_client
+                            done_cb = self.larm_succeeded
+                        else:
+                            self.set_aborted(goal_handle)
+                            rospy.logwarn('Left arm is already busy performing a gesture, please cancel it first')
+                            return
                     elif gesture is Gesture.PointRarm:
-                        self.rarm_gh = goal_handle
-                        client = self.rarm_client
-                        done_cb = self.rarm_succeeded
+                        if self.rarm_gh is None:
+                            self.rarm_gh = goal_handle
+                            client = self.rarm_client
+                            done_cb = self.rarm_succeeded
+                        else:
+                            self.set_aborted(goal_handle)
+                            rospy.logwarn('Right arm is already busy performing a gesture, please cancel it first')
+                            return
 
                     gesture_handle = GestureHandle(goal_handle, gesture, client=client)
                     self.add_gesture_handle(gesture_handle)
 
-                    if goal.duration is None:
+                    if goal.duration == -1:
                         client.send_goal(target_goal, done_cb=done_cb)
                     else:
                         client.send_goal(target_goal)
-                        gesture_handle.start_timer(duration, self.set_succeeded, goal_handle)
+                        gesture_handle.start_timer(duration, self.set_succeeded, [goal_handle])
             else:
                 self.set_aborted(goal_handle)
 

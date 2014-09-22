@@ -32,64 +32,44 @@ import actionlib
 from nao_msgs.msg import BlinkAction, BlinkGoal
 from std_msgs.msg import ColorRGBA
 from nao_hri import AtomicAnimation, RepeatingAnimation
+from enum import Enum
+import rospy
+
+
+class AnimationType(Enum):
+    Keyframe = 1
+    IK = 2
 
 
 class Expression(IExpression):
-    def __init__(*args):
-        IExpression.__init__(*args)
 
-    RedEyes = 1
-    RedLeye = 2
-    RedReye = 3
+    RedEyes = (None, 0.5, 1.0)
+    RedLeye = (None, 0.5, 1.0)
+    RedReye = (None, 0.5, 1.0)
 
-    BlueEyes = 4
-    BlueLeye = 5
-    BlueReye = 6
+    BlueEyes = (None, 0.5, 1.0)
+    BlueLeye = (None, 0.5, 1.0)
+    BlueReye = (None, 0.5, 1.0)
 
-    GreenEyes = 7
-    GreenLeye = 8
-    GreenReye = 9
-
-    WinkLeye = 10
-    WinkReye = 11
-
-    def default_speed(self):
-        expression_data = self.get_data()
-        return expression_data[1]
-
-    def default_intensity(self):
-        expression_data = self.get_data()
-        return expression_data[2]
-
-    def default_duration(self):
-        expression_data = self.get_data()
-        return expression_data[3]
+    GreenEyes = (None, 0.5, 1.0)
+    GreenLeye = (None, 0.5, 1.0)
+    GreenReye = (None, 0.5, 1.0)
 
 
 class Gesture(IGesture):
-    LarmDown = 1
-    RarmDown = 2
-    WaveLarm = 3
-    MotionRight = 4
-    MotionLeft = 5
-    HandsOnHips = 6
-    PointLarm = 7
-    PointRarm = 8
 
-    def __init__(self, *args):
-        IGesture.__init__(*args)
-        # self.data = [(self.LarmDown, 2.0),
-        #     (self.RarmDown, 2.0),
-        #     (self.WaveLarm, 6.0),
-        #     (self.MotionRight, 2.0),
-        #     (self.MotionLeft, 2.0),
-        #     (self.HandsOnHips, 3.0),
-        #     (self.PointLarm, None),
-        #     (self.PointRarm, None)]
+    LarmDown = (2.0, AnimationType.Keyframe)
+    RarmDown = (2.0, AnimationType.Keyframe)
+    WaveLarm = (6.0, AnimationType.Keyframe)
+    MotionRight = (2.0, AnimationType.Keyframe)
+    MotionLeft = (2.0, AnimationType.Keyframe)
+    HandsOnHips = (3.0, AnimationType.Keyframe)
+    PointLarm = (None, AnimationType.IK)
+    PointRarm = (None, AnimationType.IK)
 
-    def default_duration(self):
-        gesture_data = self.get_data()
-        return gesture_data[1]
+    def __init__(self, default_duration, animation_type):
+        IGesture.__init__(self, default_duration)
+        self.animation_type = animation_type
 
     def keyframe_animations(self):
         names = []
@@ -306,17 +286,21 @@ class Nao(Robot):
 
     def blink(self, blink_duration, blink_rate_mean, blink_rate_sd):
         goal = BlinkGoal()
-        goal.blink_duration = blink_duration
+        goal.blink_duration = rospy.Duration.from_sec(blink_duration)
         goal.blink_rate_mean = blink_rate_mean
         goal.blink_rate_sd = blink_rate_sd
-        goal.bg_color = ColorRGBA(r=0, g=0, b=255, a=10)
-        goal.colors = [ColorRGBA(r=0, g=0, b=255, a=255),
-                       ColorRGBA(r=0, g=0, b=255, a=200),
-                       ColorRGBA(r=0, g=0, b=255, a=220)]
+        goal.bg_color = ColorRGBA(r=0, g=0, b=255, a=255)
+        goal.colors = [ColorRGBA(r=0, g=200, b=200, a=255),
+                       ColorRGBA(r=0, g=255, b=100, a=255),
+                       ColorRGBA(r=0, g=100, b=255, a=255)]
 
         self.blink_client.send_goal(goal)
 
+    def default_tf_frame_id(self):
+        return 'torso'
 
+    def tf_frame_id(self):
+        return 'torso'
 
 
 

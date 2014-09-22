@@ -37,4 +37,6 @@ import random
 world = World()
 robot = Nao()
 
-robot.blink(0.1, 0.5, 0.1)
+robot.blink(0.5, 6, 2)
+
+robot.say('hello')
