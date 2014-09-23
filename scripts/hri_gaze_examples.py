@@ -33,9 +33,12 @@ from nao_hri import Nao
 
 world = World()
 robot = Nao()
-people = [Person(1), Person(2), Person(3)]
 
-# Gaze at each person's head
-for person in people:
-    robot.gaze_and_wait(person.head)
+person1 = Person(1)
+person2 = Person(2)
+person3 = Person(3)
+
+robot.gaze_and_wait(person1.head)
+robot.gaze_and_wait(person2.torso)
+robot.gaze_and_wait(person3.left_hand, speed=0.8)
 

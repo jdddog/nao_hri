@@ -35,20 +35,19 @@ from hri_api.query import Query
 
 world = World()
 robot = Nao()
-people = Query([Person(1), Person(2), Person(3)])
+person1 = Person(1)
+people = [person1, Person(2), Person(3)]
 
+robot.say_to_and_wait('Hello who are you?', person1)
+robot.say_to_and_wait('We choose to go to the moon in this decade, '
+                      'not because its easy, but because its hard, '
+                      'because that goal will serve to organize and '
+                      'measure the best of our energies and skills, '
+                      'because that challenge is one that we are '
+                      'willing to accept, one we are unwilling to '
+                      'postpone, and one which we intend to win.', people)
+
+# person = people.execute()[0]
+# robot.say_to_and_wait("<PointLarm target='{0}'> no its not your turn David Cunliffe! </PointLarm>".format(person.head), person)
 
 #TODO: allow lists to be passed
-
-robot.say_to_and_wait('hello who are you?', people)
-#robot.say_to_and_wait('Its hazards are hostile to us all. '
-                      # 'Its conquest deserves the best of all '
-                      # 'mankind, and its opportunity for peaceful '
-                      # 'cooperation may never come again. But why, some say, the moon? '
-                      # 'Why choose this as our goal? And they may well ask why climb the highest mountain? '
-                      # 'Why, 35 years ago, fly the Atlantic?', people)
-
-person = people.execute()[0]
-robot.say_to_and_wait("<PointLarm target='{0}'> no its not your turn David Cunliffe! </PointLarm>".format(person.head), person)
-
-

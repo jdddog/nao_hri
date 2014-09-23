@@ -1,0 +1,25 @@
+<launch>
+    <include file="$(find nao_hri)/launch/openni.launch" />
+
+    <node pkg="openni_tracker" type="openni_tracker" name="openni_tracker" >
+		<param name="camera_frame_id" value="camera_depth_frame"/>
+		<param name="smoothing" value="0.7"/>
+		<param name="num_users" value="2"/>
+	</node>
+
+	<node name="ar_kinect" pkg="ar_kinect" type="ar_kinect" respawn="true" output="screen">
+		<remap from="points" to="/camera/depth_registered/points"/>
+		<param name="marker_pattern_list" type="string" value="$(find nao_hri)/launch/objects_kinect"/>
+		<param name="marker_data_directory" type="string" value="$(find ar_pose)"/>
+		<param name="threshold" type="int" value="100"/>
+	</node>
+
+	<node name="nao_marker_smoother" pkg="nao_hri" type="ar_tag_smoother_node.py" output="screen">
+		<param name="rate" type="int" value="20"/>
+		<param name="input_topic" type="string" value="nao_marker_raw"/>
+		<param name="output_topic" type="string" value="nao_marker"/>
+	</node>
+
+    <node pkg="tf" type="static_transform_publisher" name="nao_to_kinect_transform" args="-0.045 -0.00 -0.04 0.03 1.1 0.0 1.0 nao_marker base_link 10" />
+
+</launch>

@@ -127,9 +127,15 @@ include_directories(
 ## Mark executable scripts (Python etc.) for installation
 ## in contrast to setup.py, you can choose the destination
 install(PROGRAMS
-   scripts/hri_gesture_examples.py
-   scripts/hri_say_examples.py
-   scripts/hri_rude_robot.py
+    scripts/hri_blink_examples.py
+    scripts/hri_gaze_examples.py
+    scripts/hri_gesture_examples.py
+    scripts/hri_say_examples.py
+    scripts/hri_say_to_examples.py
+    scripts/blender_target_server_node.py
+    scripts/nao_gesture_action_server_node.py
+    scripts/nao_tts_action_server_node.py
+    scripts/ar_tag_smoother_node.py
    DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
  )
 

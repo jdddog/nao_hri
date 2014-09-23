@@ -1,9 +1,9 @@
 
 people_source:
   source_type: HierarchicalEntityListSource
-  topic: users_list
+  topic: openni_tracker/users_list
   module: openni_tracker.msg
-  class: UserList
+  class: UsersList
   attribute: users
   entity_type: person
   local_id_attr: user_id

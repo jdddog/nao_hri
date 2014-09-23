@@ -48,3 +48,16 @@ robot.gesture_and_wait(Gesture.PointRarm, target=person3.head)
 
 robot.gesture_and_wait(Gesture.LarmDown)
 robot.gesture_and_wait(Gesture.RarmDown)
+
+
+#!/usr/bin/env python
+# license removed for brevity
+from nao_hri import Nao, Gesture
+
+robot = Nao()
+robot.gesture_and_wait(Gesture.HandsOnHips)
+robot.gesture_and_wait(Gesture.MotionLeft)
+robot.gesture_and_wait(Gesture.MotionRight)
+robot.gesture_and_wait(Gesture.WaveLarm, duration=10.0)
+robot.gesture_and_wait(Gesture.LarmDown)
+robot.gesture_and_wait(Gesture.RarmDown)

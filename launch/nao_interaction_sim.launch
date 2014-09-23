@@ -51,11 +51,11 @@
 
     <!-- Nao HRI Servers -->
     <param name="nao_tts_cache" value="$(find nao_hri)/launch/tts_cache.txt" />
-    <node pkg="nao_hri" type="nao_gesture_action_server.py" name="nao_gesture_action_server" args="--pip=$(arg nao_ip) --pport=$(arg nao_port) --port=0" output="screen" />
-    <node pkg="nao_hri" type="nao_tts_action_server.py" name="nao_tts_action_server" args="--pip=$(arg nao_ip) --pport=$(arg nao_port) --port=0" output="screen" />
+    <node pkg="nao_hri" type="nao_gesture_action_server_node.py" name="nao_gesture_action_server" args="--pip=$(arg nao_ip) --pport=$(arg nao_port) --port=0" output="screen" />
+    <node pkg="nao_hri" type="nao_tts_action_server_node.py" name="nao_tts_action_server" args="--pip=$(arg nao_ip) --pport=$(arg nao_port) --port=0" output="screen" />
 
 
-    <node pkg="nao_hri" type="blender_target_server.py" name="nao_gaze_action_server" output="screen">
+    <node pkg="nao_hri" type="blender_target_server_node.py" name="nao_gaze_action_server" output="screen">
         <param name="action_server_name" value="gaze" />
         <param name="controller_name" value="nao_gaze_controller" />
         <param name="end_effector_frame" value="gaze" />
@@ -64,7 +64,7 @@
         <param name="target_name" value="gaze_target" />
     </node>
 
-    <node pkg="nao_hri" type="blender_target_server.py" name="nao_point_left_server" output="screen">
+    <node pkg="nao_hri" type="blender_target_server_node.py" name="nao_point_left_server" output="screen">
         <param name="action_server_name" value="nao_point_left" />
         <param name="controller_name" value="nao_larm_controller" />
         <param name="end_effector_frame" value="l_gripper" />
@@ -73,7 +73,7 @@
         <param name="target_name" value="l_gripper_target" />
     </node>
 
-    <node pkg="nao_hri" type="blender_target_server.py" name="nao_point_right_server" output="screen">
+    <node pkg="nao_hri" type="blender_target_server_node.py" name="nao_point_right_server" output="screen">
         <param name="action_server_name" value="nao_point_right" />
         <param name="controller_name" value="nao_rarm_controller" />
         <param name="end_effector_frame" value="r_gripper" />
