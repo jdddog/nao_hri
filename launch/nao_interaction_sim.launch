@@ -4,14 +4,12 @@
     <arg name="nao_ip" default="130.216.37.144"/>
 	<arg name="nao_port" default="9559"/>
 	<env name="PYTHONPATH" value="$(env PYTHONPATH)" />
-    <param name="robot_description" command="$(find xacro)/xacro.py $(find nao_description)/urdf/nao_robot_v3.urdf.xacro" />
+    <!--<param name="robot_description" command="$(find xacro)/xacro.py $(find nao_description)/urdf/nao_robot_v3.urdf.xacro" />-->
 
-	<node pkg="nao_driver" type="nao_sensors.py" name="nao_sensors" required="true" args="--pip=$(arg nao_ip) --pport=$(arg nao_port)" />
-	<node pkg="nao_driver" type="nao_controller.py" name="nao_controller" required="true" args="--pip=$(arg nao_ip) --pport=$(arg nao_port)" />
-    <node pkg="nao_driver" type="nao_leds.py" name="nao_leds" args="--pip=$(arg nao_ip) --pport=$(arg nao_port)" />
 
-	<node pkg="robot_state_publisher" type="state_publisher" name="robot_state_publisher" />
-	<node pkg="nao_description" type="base_footprint" name="base_footprint" />
+
+	<!--<node pkg="robot_state_publisher" type="state_publisher" name="robot_state_publisher" />-->
+	<!--<node pkg="nao_description" type="base_footprint" name="base_footprint" />-->
 
     <!-- Blender controllers -->
     <!--<param name="armature_name" value="Armature" />-->
@@ -49,10 +47,6 @@
 	<!--</node>-->
 
 
-    <!-- Nao HRI Servers -->
-    <param name="nao_tts_cache" value="$(find nao_hri)/launch/tts_cache.txt" />
-    <node pkg="nao_hri" type="nao_gesture_action_server_node.py" name="nao_gesture_action_server" args="--pip=$(arg nao_ip) --pport=$(arg nao_port) --port=0" output="screen" />
-    <node pkg="nao_hri" type="nao_tts_action_server_node.py" name="nao_tts_action_server" args="--pip=$(arg nao_ip) --pport=$(arg nao_port) --port=0" output="screen" />
 
 
     <!--<node pkg="nao_hri" type="blender_target_server_node.py" name="nao_gaze_action_server" output="screen">-->
@@ -82,19 +76,19 @@
         <!--<param name="target_name" value="r_gripper_target" />-->
     <!--</node>-->
 
-    <!--<node pkg="hri_framework" type="perception_synthesiser.py" name="perception_synthesiser" output="screen">-->
-        <!--<param name="perception_sources_yaml" value="$(find nao_hri)/launch/perception_sources.yaml" />-->
-    <!--</node>-->
+    <node pkg="hri_framework" type="perception_synthesiser.py" name="perception_synthesiser" output="screen">
+        <param name="perception_sources_yaml" value="$(find nao_hri)/launch/perception_sources.yaml" />
+    </node>
 
     <!-- Fake people -->
-    <node pkg="tf" type="static_transform_publisher" name="base_link_to_map" args="0 0 1 0 0 0 /map /odom 20" />
+    <!--<node pkg="tf" type="static_transform_publisher" name="base_link_to_map" args="0 0 1 0 0 0 /map /odom 20" />-->
 
-    <node pkg="tf" type="static_transform_publisher" name="person1_head" args="2 2 1.9 0 0 0 /map /person1_head 20" />
-    <node pkg="tf" type="static_transform_publisher" name="person1_torso" args="2 2 1 0 0 0 /map /person1_torso 20" />
+    <!--<node pkg="tf" type="static_transform_publisher" name="person1_head" args="2 2 1.9 0 0 0 /map /person1_head 20" />-->
+    <!--<node pkg="tf" type="static_transform_publisher" name="person1_torso" args="2 2 1 0 0 0 /map /person1_torso 20" />-->
 
-    <node pkg="tf" type="static_transform_publisher" name="person2_head" args="2 0.3 1.76 0 0 0 /map /person2_head 20" />
-    <node pkg="tf" type="static_transform_publisher" name="person2_torso" args="2 0.3 1.16 0 0 0 /map /person2_torso 20" />
+    <!--<node pkg="tf" type="static_transform_publisher" name="person2_head" args="2 0.3 1.76 0 0 0 /map /person2_head 20" />-->
+    <!--<node pkg="tf" type="static_transform_publisher" name="person2_torso" args="2 0.3 1.16 0 0 0 /map /person2_torso 20" />-->
 
-    <node pkg="tf" type="static_transform_publisher" name="person3_head" args="1 -1 1.5 0 0 0 /map /person3_head 20" />
-    <node pkg="tf" type="static_transform_publisher" name="person3_torso" args="1 -1 0.9 0 0 0 /map /person3_torso 20" />
+    <!--<node pkg="tf" type="static_transform_publisher" name="person3_head" args="1 -1 1.5 0 0 0 /map /person3_head 20" />-->
+    <!--<node pkg="tf" type="static_transform_publisher" name="person3_torso" args="1 -1 0.9 0 0 0 /map /person3_torso 20" />-->
 </launch>

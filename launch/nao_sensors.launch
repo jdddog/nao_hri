@@ -5,6 +5,7 @@
 		<param name="camera_frame_id" value="camera_depth_frame"/>
 		<param name="smoothing" value="0.7"/>
 		<param name="num_users" value="2"/>
+        <param name="skeleton_profile" value="XN_SKEL_PROFILE_HEAD_HANDS" />
 	</node>
 
 	<node name="ar_kinect" pkg="ar_kinect" type="ar_kinect" respawn="true" output="screen">

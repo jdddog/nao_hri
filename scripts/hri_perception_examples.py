@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # Copyright (c) 2014, James Diprose
 # All rights reserved.
 #
@@ -28,33 +27,23 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-from hri_api.entities import World, Person
-from nao_hri import Nao, Gesture
-import time
+import rospy
+from hri_api.entities import Person, World
+from hri_api.query import Query
 
+
+# Initialize World, Nao and People (their coordinates are specified in the launch file)
 world = World()
-robot = Nao()
-person1 = Person(1)
-person2 = Person(2)
-person3 = Person(3)
+people = Query(world).select_type(Person)
 
-# robot.gesture_and_wait(Gesture.HandsOnHips, duration=1.0)
-#
-# ah1 = robot.gesture(Gesture.MotionLeft)
-# ah2 = robot.gesture(Gesture.MotionRight)
-# robot.wait(ah1, ah2)
-#
-# ah3 = robot.gesture(Gesture.WaveLarm, duration=6.0)
-# ah4 = robot.gesture(Gesture.RarmDown)
-# robot.wait(ah3, ah4)
-#
-# robot.gesture_and_wait(Gesture.LarmDown)
+rate = rospy.Rate(2)
 
-ah5 = robot.gesture(Gesture.WaveLarm, duration=6.0)
-time.sleep(2.0)
-robot.cancel(ah5)
+while True:
+    ppl_list = people.execute()
 
-# robot.gesture_and_wait(Gesture.PointLarm, target=person1.head)
-# robot.gesture_and_wait(Gesture.PointRarm, target=person2.torso)
-# robot.gesture_and_wait(Gesture.PointRarm, target=person3.head)
+    for person in ppl_list:
+        print('{0} visible: {1}'.format(person.tf_frame_id(), person.visible))
+        rate.sleep()
+
+
 
