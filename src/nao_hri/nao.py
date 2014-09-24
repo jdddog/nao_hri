@@ -64,6 +64,7 @@ class Gesture(IGesture):
     MotionRight = (2.0, AnimationType.Keyframe)
     MotionLeft = (2.0, AnimationType.Keyframe)
     HandsOnHips = (3.0, AnimationType.Keyframe)
+    DontMakeMeDoThis = (6.0, AnimationType.Keyframe)
     PointLarm = (None, AnimationType.IK)
     PointRarm = (None, AnimationType.IK)
 
@@ -273,6 +274,44 @@ class Gesture(IGesture):
             keys.append([ [ 0.05518, [ 3, -0.33333, 0.00000], [ 3, 0.36000, 0.00000]], [ 0.03217, [ 3, -0.36000, 0.00000], [ 3, 0.00000, 0.00000]]])
 
             animations.append(AtomicAnimation(names, times, keys))
+
+        elif self is Gesture.DontMakeMeDoThis:
+            names.append("LElbowRoll")
+            times.append([ 0.40000, 0.80000])
+            keys.append([ [ -0.85900, [ 3, -0.13333, 0.00000], [ 3, 0.13333, 0.00000]], [ -0.90195, [ 3, -0.13333, 0.00000], [ 3, 0.00000, 0.00000]]])
+
+            names.append("LElbowYaw")
+            times.append([ 0.40000, 0.80000])
+            keys.append([ [ -0.06447, [ 3, -0.13333, 0.00000], [ 3, 0.13333, 0.00000]], [ -0.06447, [ 3, -0.13333, 0.00000], [ 3, 0.00000, 0.00000]]])
+
+
+            names.append("LShoulderPitch")
+            times.append([ 0.40000, 0.80000])
+            keys.append([ [ 1.03387, [ 3, -0.13333, 0.00000], [ 3, 0.13333, 0.00000]], [ 0.75622, [ 3, -0.13333, 0.00000], [ 3, 0.00000, 0.00000]]])
+
+            names.append("LShoulderRoll")
+            times.append([ 0.40000, 0.80000])
+            keys.append([ [ 0.06285, [ 3, -0.13333, 0.00000], [ 3, 0.13333, 0.00000]], [ 0.09046, [ 3, -0.13333, 0.00000], [ 3, 0.00000, 0.00000]]])
+
+            names.append("LWristYaw")
+            times.append([ 0.40000, 0.80000])
+            keys.append([ [ -1.54018, [ 3, -0.13333, 0.00000], [ 3, 0.13333, 0.00000]], [ -1.62148, [ 3, -0.13333, 0.00000], [ 3, 0.00000, 0.00000]]])
+
+            oscilate_arm = RepeatingAnimation(names, times, keys, 1)
+
+            names = []
+            times = []
+            keys = []
+            open_finger_duration = 0.8
+
+            names.append("LHand")
+            times.append([ 0.40000, 0.80000])
+            keys.append([ [ 0.599297, [ 3, -0.13333, 0.00000], [ 3, 0.13333, 0.00000]], [ 0.599297, [ 3, -0.13333, 0.00000], [ 3, 0.00000, 0.00000]]])
+
+            open_fingers = AtomicAnimation(names, times, keys, override_time=open_finger_duration)
+
+            animations.append(oscilate_arm)
+            animations.append(open_fingers)
 
         return animations
 

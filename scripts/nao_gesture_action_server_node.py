@@ -29,29 +29,19 @@
 
 import rospy
 import actionlib
-from hri_framework import IGestureActionServer
+from hri_framework import IGestureActionServer, GestureHandle
 from nao_hri import NaoNode, Gesture
 from hri_msgs.msg import TargetAction, TargetGoal
 from threading import Timer, RLock
 from nao_hri import AnimationType
+from threading import Thread
 
 
-class GestureHandle():
+class NaoGestureHandle(GestureHandle):
     def __init__(self, goal_handle, gesture, motion_id=None, client=None):
-        self.goal_id = goal_handle.get_goal_id().id
-        self.gesture = gesture
-        self.goal_handle = goal_handle
-        self.timer = None
+        GestureHandle.__init__(self, goal_handle, gesture)
         self.motion_id = motion_id
         self.client = client
-
-    def start_timer(self, duration, callback, args):
-        self.timer = Timer(duration, callback, args)
-        self.timer.start()
-
-    def stop_timer(self):
-        if self.timer is not None:
-            self.timer.cancel()
 
 
 class NaoGestureActionServer(IGestureActionServer, NaoNode):
@@ -73,6 +63,18 @@ class NaoGestureActionServer(IGestureActionServer, NaoNode):
         self.motion_proxy = self.get_proxy('ALMotion')
         super(NaoGestureActionServer, self).start()
 
+    @staticmethod
+    def get_actual_duration(times):
+        maxTime = 0.0
+
+        for time in times:
+            tempMax = max(time)
+
+            if tempMax > maxTime:
+                maxTime = tempMax
+
+        return maxTime
+
     def start_gesture(self, goal_handle):
         with self.lock:
             goal = goal_handle.get_goal()
@@ -90,17 +92,23 @@ class NaoGestureActionServer(IGestureActionServer, NaoNode):
                     names = []
                     times = []
                     keys = []
+                    durations = []
 
                     for a in animations:
+                        durations.append(a.get_end_time())
+
                         (n_temp, t_temp, k_temp) = a.get_ntk(duration)
                         names += n_temp
                         times += t_temp
                         keys += k_temp
 
+                    actual_duration = NaoGestureActionServer.get_actual_duration(times)
+
                     motion_id = self.motion_proxy.post.angleInterpolationBezier(names, times, keys)
-                    gesture_handle = GestureHandle(goal_handle, gesture, motion_id=motion_id)
+
+                    gesture_handle = NaoGestureHandle(goal_handle, gesture, motion_id=motion_id)
                     self.add_gesture_handle(gesture_handle)
-                    gesture_handle.start_timer(duration, self.set_succeeded, [goal_handle])
+                    gesture_handle.start_timer(actual_duration, self.set_succeeded, [goal_handle])
 
                 else:
                     target_goal = TargetGoal()
@@ -127,7 +135,7 @@ class NaoGestureActionServer(IGestureActionServer, NaoNode):
                             rospy.logwarn('Right arm is already busy performing a gesture, please cancel it first')
                             return
 
-                    gesture_handle = GestureHandle(goal_handle, gesture, client=client)
+                    gesture_handle = NaoGestureHandle(goal_handle, gesture, client=client)
                     self.add_gesture_handle(gesture_handle)
 
                     if goal.duration == -1:
@@ -140,17 +148,13 @@ class NaoGestureActionServer(IGestureActionServer, NaoNode):
 
     def larm_succeeded(self):
         with self.lock:
-            gesture_handle = self.get_gesture_handle(self.larm_gh)
             self.set_succeeded(self.larm_gh)
             self.larm_gh = None
-            self.remove_gesture_handle(gesture_handle)
 
     def rarm_succeeded(self):
         with self.lock:
-            gesture_handle = self.get_gesture_handle(self.rarm_gh)
             self.set_succeeded(self.rarm_gh)
             self.rarm_gh = None
-            self.remove_gesture_handle(gesture_handle)
 
     def larm_cancelled(self):
         with self.lock:
@@ -167,12 +171,10 @@ class NaoGestureActionServer(IGestureActionServer, NaoNode):
             gesture_handle = self.get_gesture_handle(goal_handle)
             gesture_handle.stop_timer()
 
-            if self.is_keyframe_animation(gesture_handle.gesture):
+            if gesture_handle.gesture.animation_type is AnimationType.Keyframe:
                 self.motion_proxy.stop(gesture_handle.motion_id)
             else:
                 gesture_handle.client.cancel_goal()
-
-            self.remove_gesture_handle(gesture_handle)
 
 if __name__ == "__main__":
     rospy.init_node('gesture_action_server')
