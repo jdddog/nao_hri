@@ -5,7 +5,7 @@
 		<param name="camera_frame_id" value="camera_depth_frame"/>
 		<param name="smoothing" value="0.7"/>
 		<param name="num_users" value="2"/>
-        <param name="skeleton_profile" value="XN_SKEL_PROFILE_HEAD_HANDS" />
+        <param name="skeleton_profile" value="XN_SKEL_PROFILE_ALL" />
 	</node>
 
 	<node name="ar_kinect" pkg="ar_kinect" type="ar_kinect" respawn="true" output="screen">
@@ -20,7 +20,5 @@
 		<param name="input_topic" type="string" value="nao_marker_raw"/>
 		<param name="output_topic" type="string" value="nao_marker"/>
 	</node>
-
-    <node pkg="tf" type="static_transform_publisher" name="nao_to_kinect_transform" args="-0.045 -0.00 -0.04 0.03 1.1 0.0 1.0 nao_marker base_link 10" />
 
 </launch>

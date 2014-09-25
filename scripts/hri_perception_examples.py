@@ -30,20 +30,36 @@
 import rospy
 from hri_api.entities import Person, World
 from hri_api.query import Query
+from nao_hri import Nao, Gesture
 
 
-# Initialize World, Nao and People (their coordinates are specified in the launch file)
 world = World()
+
+robot = Nao()
 people = Query(world).select_type(Person)
+closest_person = people.sort_decreasing(lambda p: p.distance_to(robot)).take(1)
+
+# Wait until
 
 rate = rospy.Rate(2)
+while not rospy.is_shutdown():
+    result = people.execute()
 
-while True:
-    ppl_list = people.execute()
+    if len(result) > 0:
+        break
 
-    for person in ppl_list:
-        print('{0} visible: {1}'.format(person.tf_frame_id(), person.visible))
-        rate.sleep()
+    rate.sleep()
+
+ah1 = robot.say_to('Hello I can see you!', closest_person)
+ah2 = robot.gesture(Gesture.WaveLarm)
+robot.wait(ah1, ah2)
+
+#ah1 = robot.say_to("<PointRarm target='{0}'> Hello, I can see you! </PointRarm>".format(closest_person.head), people)
+
+
+
+
+
 
 
 

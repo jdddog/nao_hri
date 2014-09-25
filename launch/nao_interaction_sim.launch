@@ -1,94 +1,15 @@
 <launch>
-
-    <!-- Nao ROS drivers -->
-    <arg name="nao_ip" default="130.216.37.144"/>
-	<arg name="nao_port" default="9559"/>
-	<env name="PYTHONPATH" value="$(env PYTHONPATH)" />
-    <!--<param name="robot_description" command="$(find xacro)/xacro.py $(find nao_description)/urdf/nao_robot_v3.urdf.xacro" />-->
-
-
-
-	<!--<node pkg="robot_state_publisher" type="state_publisher" name="robot_state_publisher" />-->
-	<!--<node pkg="nao_description" type="base_footprint" name="base_footprint" />-->
-
-    <!-- Blender controllers -->
-    <!--<param name="armature_name" value="Armature" />-->
-    <!--<param name="blender_target_controllers" value="$(find nao_hri)/launch/nao_target_controllers.yaml" />-->
-
-    <!--<node pkg="ros_blender_bridge" type="run_target_controllers.py" name="blender_target_controllers" output="screen" />-->
-
-    <!--<node pkg="ros_blender_bridge" type="launch_blender" name="launch_blender" output="screen">-->
-        <!--<param name="blend_file" value="$(find nao_hri)/launch/nao.blend" />-->
-        <!--<param name="use_game_engine" value="false" />-->
-        <!--<param name="python_script" value="$(find ros_blender_bridge)/scripts/run_blender_node.py" />-->
-    <!--</node>-->
-
-    <!-- Sensors -->
-	<!--<node name="ar_kinect" pkg="ar_kinect" type="ar_kinect" respawn="true" output="screen">-->
-		<!--<remap from="points" to="/camera/depth_registered/points"/>-->
-		<!--<param name="marker_pattern_list" type="string" value="$(find nao_hri)/launch/objects_kinect"/>-->
-		<!--<param name="marker_data_directory" type="string" value="$(find ar_pose)"/>-->
-		<!--<param name="threshold" type="int" value="100"/>-->
-	<!--</node>-->
-
-	<!--<node name="nao_marker_smoother" pkg="hri_api" type="smoother.py" output="screen">-->
-		<!--<param name="rate" type="int" value="20"/>-->
-		<!--<param name="input_topic" type="string" value="nao_marker_raw"/>-->
-		<!--<param name="output_topic" type="string" value="nao_marker"/>-->
-	<!--</node>-->
-
-    <!--<node pkg="tf" type="static_transform_publisher" name="nao_to_kinect_transform" args="-0.045 -0.00 -0.04 0.03 1.1 0.0 1.0 nao_marker base_link 10" />-->
-
-
-	<!--<node pkg="openni_tracker" type="openni_tracker" name="openni_tracker" >-->
-		<!--<param name="camera_frame_id" value="camera_depth_frame"/>-->
-		<!--<param name="smoothing" value="0.7"/>-->
-		<!--<param name="num_users" value="2"/>-->
-	<!--</node>-->
-
-
-
-
-    <!--<node pkg="nao_hri" type="blender_target_server_node.py" name="nao_gaze_action_server" output="screen">-->
-        <!--<param name="action_server_name" value="gaze" />-->
-        <!--<param name="controller_name" value="nao_gaze_controller" />-->
-        <!--<param name="end_effector_frame" value="gaze" />-->
-        <!--<param name="success_distance" value="0.15" />-->
-        <!--<param name="axes" value="yz" />-->
-        <!--<param name="target_name" value="gaze_target" />-->
-    <!--</node>-->
-
-    <!--<node pkg="nao_hri" type="blender_target_server_node.py" name="nao_point_left_server" output="screen">-->
-        <!--<param name="action_server_name" value="nao_point_left" />-->
-        <!--<param name="controller_name" value="nao_larm_controller" />-->
-        <!--<param name="end_effector_frame" value="l_gripper" />-->
-        <!--<param name="success_distance" value="0.3" />-->
-        <!--<param name="axes" value="yz" />-->
-        <!--<param name="target_name" value="l_gripper_target" />-->
-    <!--</node>-->
-
-    <!--<node pkg="nao_hri" type="blender_target_server_node.py" name="nao_point_right_server" output="screen">-->
-        <!--<param name="action_server_name" value="nao_point_right" />-->
-        <!--<param name="controller_name" value="nao_rarm_controller" />-->
-        <!--<param name="end_effector_frame" value="r_gripper" />-->
-        <!--<param name="success_distance" value="0.3" />-->
-        <!--<param name="axes" value="yz" />-->
-        <!--<param name="target_name" value="r_gripper_target" />-->
-    <!--</node>-->
-
-    <node pkg="hri_framework" type="perception_synthesiser.py" name="perception_synthesiser" output="screen">
-        <param name="perception_sources_yaml" value="$(find nao_hri)/launch/perception_sources.yaml" />
-    </node>
+    <include file="$(find nao_hri)/launch/nao_drivers.launch" />
 
     <!-- Fake people -->
-    <!--<node pkg="tf" type="static_transform_publisher" name="base_link_to_map" args="0 0 1 0 0 0 /map /odom 20" />-->
+    <node pkg="tf" type="static_transform_publisher" name="base_link_to_map" args="0 0 1 0 0 0 /map /odom 20" />
 
-    <!--<node pkg="tf" type="static_transform_publisher" name="person1_head" args="2 2 1.9 0 0 0 /map /person1_head 20" />-->
-    <!--<node pkg="tf" type="static_transform_publisher" name="person1_torso" args="2 2 1 0 0 0 /map /person1_torso 20" />-->
+    <node pkg="tf" type="static_transform_publisher" name="person1_head" args="2 2 1.9 0 0 0 /map /person1_head 20" />
+    <node pkg="tf" type="static_transform_publisher" name="person1_torso" args="2 2 1 0 0 0 /map /person1_torso 20" />
 
-    <!--<node pkg="tf" type="static_transform_publisher" name="person2_head" args="2 0.3 1.76 0 0 0 /map /person2_head 20" />-->
-    <!--<node pkg="tf" type="static_transform_publisher" name="person2_torso" args="2 0.3 1.16 0 0 0 /map /person2_torso 20" />-->
+    <node pkg="tf" type="static_transform_publisher" name="person2_head" args="2 0.3 1.76 0 0 0 /map /person2_head 20" />
+    <node pkg="tf" type="static_transform_publisher" name="person2_torso" args="2 0.3 1.16 0 0 0 /map /person2_torso 20" />
 
-    <!--<node pkg="tf" type="static_transform_publisher" name="person3_head" args="1 -1 1.5 0 0 0 /map /person3_head 20" />-->
-    <!--<node pkg="tf" type="static_transform_publisher" name="person3_torso" args="1 -1 0.9 0 0 0 /map /person3_torso 20" />-->
+    <node pkg="tf" type="static_transform_publisher" name="person3_head" args="1 -1 1.5 0 0 0 /map /person3_head 20" />
+    <node pkg="tf" type="static_transform_publisher" name="person3_torso" args="1 -1 0.9 0 0 0 /map /person3_torso 20" />
 </launch>
