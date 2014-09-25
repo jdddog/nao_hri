@@ -48,19 +48,15 @@ while not rospy.is_shutdown():
 
     rate.sleep()
 
+ah0 = robot.gesture(Gesture.PointRarm, target=result[0].head)
 ah1 = robot.say_to('Hello I can see you!', closest_person)
 ah2 = robot.gesture(Gesture.WaveLarm)
-robot.wait(ah1, ah2)
+robot.wait(ah1, ah2, ah0)
 
 
 
-
-
-
-
-
-
-#ah1 = robot.say_to("<PointRarm target='{0}'> Hello, I can see you! </PointRarm>".format(closest_person.head), people)
+# ah1 = robot.say_to("<PointRarm target='{0}'> Hello, I can see you! </PointRarm>".format(), people)
+# robot.wait(ah1)
 
 
 

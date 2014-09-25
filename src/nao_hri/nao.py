@@ -320,8 +320,8 @@ class Nao(Robot):
 
     def __init__(self):
         Robot.__init__(self, Expression, Gesture)
-        self.blink_client = actionlib.SimpleActionClient('blink', BlinkAction)
-        self.wait_for_action_servers(self.blink_client)
+        #self.blink_client = actionlib.SimpleActionClient('blink', BlinkAction)
+        #self.wait_for_action_servers(self.blink_client)
 
     def blink(self, blink_duration, blink_rate_mean, blink_rate_sd):
         goal = BlinkGoal()

@@ -34,9 +34,13 @@ import time
 
 world = World()
 robot = Nao()
-person1 = Person(1)
-person2 = Person(2)
-person3 = Person(3)
+# person1 = Person(1)
+# person2 = Person(2)
+# person3 = Person(3)
+
+
+
+
 
 # robot.gesture_and_wait(Gesture.HandsOnHips, duration=1.0)
 #
@@ -49,10 +53,10 @@ person3 = Person(3)
 # robot.wait(ah3, ah4)
 #
 # robot.gesture_and_wait(Gesture.LarmDown)
-
-ah5 = robot.gesture(Gesture.WaveLarm, duration=6.0)
-time.sleep(2.0)
-robot.cancel(ah5)
+#
+# ah5 = robot.gesture(Gesture.WaveLarm, duration=6.0)
+# time.sleep(2.0)
+# robot.cancel(ah5)
 
 # robot.gesture_and_wait(Gesture.PointLarm, target=person1.head)
 # robot.gesture_and_wait(Gesture.PointRarm, target=person2.torso)
