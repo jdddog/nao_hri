@@ -39,11 +39,9 @@ robot = Nao()
 people = Query(world).select_type(Person)
 closest_person = people.sort_decreasing(lambda p: p.distance_to(robot)).take(1)
 
-# Wait until
-
 rate = rospy.Rate(2)
 while not rospy.is_shutdown():
-    result = people.execute()
+    result = closest_person.execute()
 
     if len(result) > 0:
         break
@@ -53,6 +51,14 @@ while not rospy.is_shutdown():
 ah1 = robot.say_to('Hello I can see you!', closest_person)
 ah2 = robot.gesture(Gesture.WaveLarm)
 robot.wait(ah1, ah2)
+
+
+
+
+
+
+
+
 
 #ah1 = robot.say_to("<PointRarm target='{0}'> Hello, I can see you! </PointRarm>".format(closest_person.head), people)
 
