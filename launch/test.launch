@@ -1,0 +1,5 @@
+<launch>
+    <node pkg="hri_framework" type="perception_synthesiser.py" name="perception_synthesiser" output="screen">
+        <param name="perception_sources_yaml" value="$(find nao_hri)/launch/perception_sources.yaml" />
+    </node>
+</launch>

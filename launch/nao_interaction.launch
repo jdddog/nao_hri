@@ -1,0 +1,3 @@
+<launch>
+    <include file="$(find nao_hri)/launch/nao_drivers.launch" />
+</launch>
