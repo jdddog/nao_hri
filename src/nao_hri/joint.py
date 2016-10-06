@@ -28,7 +28,7 @@
 
 import rospy
 from ros_blender_bridge import Joint
-from nao_msgs.msg import JointAnglesWithSpeed
+from naoqi_bridge_msgs.msg import JointAnglesWithSpeed
 
 
 class NaoJoint(Joint):

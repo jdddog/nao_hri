@@ -8,8 +8,8 @@ find_package(catkin REQUIRED COMPONENTS
   hri_api
   hri_framework
   hri_msgs
-  nao_driver
-  nao_msgs
+  naoqi_driver_py
+  naoqi_bridge_msgs
   rospy
 )
 

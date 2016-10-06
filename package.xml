@@ -40,14 +40,15 @@
   <!-- Use test_depend for packages you need only for testing: -->
   <!--   <test_depend>gtest</test_depend> -->
   <buildtool_depend>catkin</buildtool_depend>
-  <build_depend>nao_driver</build_depend>
+
+  <build_depend>naoqi_driver_py</build_depend>
     <build_depend>nao_description</build_depend>
   <build_depend>rospy</build_depend>
   <build_depend>hri_api</build_depend>
     <build_depend>hri_msgs</build_depend>
     <build_depend>hri_framework</build_depend>
 
-      <run_depend>nao_driver</run_depend>
+      <run_depend>naoqi_driver</run_depend>
     <run_depend>nao_description</run_depend>
   <run_depend>hri_api</run_depend>
     <run_depend>hri_msgs</run_depend>

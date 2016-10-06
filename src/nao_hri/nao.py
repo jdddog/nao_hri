@@ -29,7 +29,6 @@
 from hri_api.entities import Robot
 from hri_api.entities import IExpression, IGesture
 import actionlib
-from nao_msgs.msg import BlinkAction, BlinkGoal
 from std_msgs.msg import ColorRGBA
 from nao_hri import AtomicAnimation, RepeatingAnimation
 from enum import Enum
@@ -322,18 +321,6 @@ class Nao(Robot):
         Robot.__init__(self, Expression, Gesture)
         #self.blink_client = actionlib.SimpleActionClient('blink', BlinkAction)
         #self.wait_for_action_servers(self.blink_client)
-
-    def blink(self, blink_duration, blink_rate_mean, blink_rate_sd):
-        goal = BlinkGoal()
-        goal.blink_duration = rospy.Duration.from_sec(blink_duration)
-        goal.blink_rate_mean = blink_rate_mean
-        goal.blink_rate_sd = blink_rate_sd
-        goal.bg_color = ColorRGBA(r=0, g=0, b=255, a=255)
-        goal.colors = [ColorRGBA(r=0, g=200, b=200, a=255),
-                       ColorRGBA(r=0, g=255, b=100, a=255),
-                       ColorRGBA(r=0, g=100, b=255, a=255)]
-
-        self.blink_client.send_goal(goal)
 
     def default_tf_frame_id(self):
         return 'torso'
