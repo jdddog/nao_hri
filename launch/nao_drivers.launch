@@ -29,9 +29,6 @@
         <param name="python_script" value="$(find ros_blender_bridge)/scripts/run_blender_node.py"/>
     </node>
 
-    <node pkg="tf" type="static_transform_publisher" name="nao_to_kinect_transform"
-          args="-0.045 -0.00 -0.04 0.03 1.1 0.0 1.0 nao_marker base_link 10"/>
-
     <!-- Nao HRI -->
     <param name="nao_tts_cache" value="$(find nao_hri)/launch/tts_cache.txt"/>
     <node pkg="nao_hri" type="nao_gesture_action_server_node.py" name="nao_gesture_action_server"
