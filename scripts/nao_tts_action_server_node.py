@@ -112,6 +112,7 @@ class NaoTextToSpeechActionServer(ITextToSpeechActionServer, NaoNode):
             raise Exception('nao_tts_cache parameter not found')
 
     def synthesise_sentence(self, sentence):
+        print("synthesising!", sentence)
         self.num_words_sentence = NaoTextToSpeechActionServer.words_in_text(sentence)
         self.current_word_index = 0
         self.word_times = []

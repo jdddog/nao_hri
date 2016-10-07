@@ -58,6 +58,8 @@ class Expression(IExpression):
 
 class Gesture(IGesture):
 
+    LarmDownSitting = (2.0, AnimationType.Keyframe)
+    RarmDownSitting = (2.0, AnimationType.Keyframe)
     LarmDown = (2.0, AnimationType.Keyframe)
     RarmDown = (2.0, AnimationType.Keyframe)
     WaveLarm = (6.0, AnimationType.Keyframe)
@@ -78,7 +80,61 @@ class Gesture(IGesture):
         keys = []
         animations = []
 
-        if self is Gesture.LarmDown:
+        if self is Gesture.LarmDownSitting:
+            names.append("LElbowRoll")
+            times.append([0.84000])
+            keys.append([[-1.22716, [3, -0.28000, 0.00000], [3, 0.00000, 0.00000]]])
+
+            names.append("LElbowYaw")
+            times.append([0.84000])
+            keys.append([[-0.45104, [3, -0.28000, 0.00000], [3, 0.00000, 0.00000]]])
+
+            names.append("LHand")
+            times.append([0.84000])
+            keys.append([[0.00527, [3, -0.28000, 0.00000], [3, 0.00000, 0.00000]]])
+
+            names.append("LShoulderPitch")
+            times.append([0.84000])
+            keys.append([[0.89888, [3, -0.28000, 0.00000], [3, 0.00000, 0.00000]]])
+
+            names.append("LShoulderRoll")
+            times.append([0.84000])
+            keys.append([[0.21318, [3, -0.28000, 0.00000], [3, 0.00000, 0.00000]]])
+
+            names.append("LWristYaw")
+            times.append([0.84000])
+            keys.append([[0.05365, [3, -0.28000, 0.00000], [3, 0.00000, 0.00000]]])
+
+            animations.append(AtomicAnimation(names, times, keys))
+
+        elif self is Gesture.RarmDownSitting:
+            names.append("RElbowRoll")
+            times.append([0.84000])
+            keys.append([[1.24565, [3, -0.28000, 0.00000], [3, 0.00000, 0.00000]]])
+
+            names.append("RElbowYaw")
+            times.append([0.84000])
+            keys.append([[0.48010, [3, -0.28000, 0.00000], [3, 0.00000, 0.00000]]])
+
+            names.append("RHand")
+            times.append([0.84000])
+            keys.append([[0.00532, [3, -0.28000, 0.00000], [3, 0.00000, 0.00000]]])
+
+            names.append("RShoulderPitch")
+            times.append([0.84000])
+            keys.append([[0.92811, [3, -0.28000, 0.00000], [3, 0.00000, 0.00000]]])
+
+            names.append("RShoulderRoll")
+            times.append([0.84000])
+            keys.append([[-0.24702, [3, -0.28000, 0.00000], [3, 0.00000, 0.00000]]])
+
+            names.append("RWristYaw")
+            times.append([0.84000])
+            keys.append([[-0.02305, [3, -0.28000, 0.00000], [3, 0.00000, 0.00000]]])
+
+            animations.append(AtomicAnimation(names, times, keys))
+
+        elif self is Gesture.LarmDown:
             names.append("LElbowRoll")
             times.append([ 0.80000])
             keys.append([ [ -0.42242, [ 3, -0.26667, 0.00000], [ 3, 0.00000, 0.00000]]])
@@ -320,8 +376,8 @@ class Nao(Robot):
 
     def __init__(self):
         Robot.__init__(self, Expression, Gesture)
-        #self.blink_client = actionlib.SimpleActionClient('blink', BlinkAction)
-        #self.wait_for_action_servers(self.blink_client)
+        self.blink_client = actionlib.SimpleActionClient('blink', BlinkAction)
+        self.wait_for_action_servers(self.blink_client)
 
     def blink(self, blink_duration, blink_rate_mean, blink_rate_sd):
         goal = BlinkGoal()

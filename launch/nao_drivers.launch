@@ -1,7 +1,7 @@
 <launch>
     <!-- Nao ROS drivers -->
-    <arg name="nao_ip" default="130.216.37.144"/>
-	<arg name="nao_port" default="9559"/>
+    <arg name="nao_ip" default="$(optenv NAO_IP 127.0.0.1)"/>
+<arg name="nao_port" default="$(optenv NAO_PORT 9559)"/>
 	<env name="PYTHONPATH" value="$(env PYTHONPATH)" />
     <param name="robot_description" command="$(find xacro)/xacro.py $(find nao_description)/urdf/nao_robot_v3.urdf.xacro" />
 
@@ -42,23 +42,23 @@
         <param name="target_name" value="gaze_target" />
     </node>
 
-    <node pkg="nao_hri" type="blender_target_server_node.py" name="nao_point_left_server" output="screen">
-        <param name="action_server_name" value="nao_point_left" />
-        <param name="controller_name" value="nao_larm_controller" />
-        <param name="end_effector_frame" value="l_gripper" />
-        <param name="success_distance" value="0.3" />
-        <param name="axes" value="yz" />
-        <param name="target_name" value="l_gripper_target" />
-    </node>
+    <!--<node pkg="nao_hri" type="blender_target_server_node.py" name="nao_point_left_server" output="screen">-->
+        <!--<param name="action_server_name" value="nao_point_left" />-->
+        <!--<param name="controller_name" value="nao_larm_controller" />-->
+        <!--<param name="end_effector_frame" value="l_gripper" />-->
+        <!--<param name="success_distance" value="0.3" />-->
+        <!--<param name="axes" value="yz" />-->
+        <!--<param name="target_name" value="l_gripper_target" />-->
+    <!--</node>-->
 
-    <node pkg="nao_hri" type="blender_target_server_node.py" name="nao_point_right_server" output="screen">
-        <param name="action_server_name" value="nao_point_right" />
-        <param name="controller_name" value="nao_rarm_controller" />
-        <param name="end_effector_frame" value="r_gripper" />
-        <param name="success_distance" value="0.3" />
-        <param name="axes" value="yz" />
-        <param name="target_name" value="r_gripper_target" />
-    </node>
+    <!--<node pkg="nao_hri" type="blender_target_server_node.py" name="nao_point_right_server" output="screen">-->
+        <!--<param name="action_server_name" value="nao_point_right" />-->
+        <!--<param name="controller_name" value="nao_rarm_controller" />-->
+        <!--<param name="end_effector_frame" value="r_gripper" />-->
+        <!--<param name="success_distance" value="0.3" />-->
+        <!--<param name="axes" value="yz" />-->
+        <!--<param name="target_name" value="r_gripper_target" />-->
+    <!--</node>-->
 
     <node pkg="hri_framework" type="perception_synthesiser.py" name="perception_synthesiser" output="screen">
         <param name="perception_sources_yaml" value="$(find nao_hri)/launch/perception_sources.yaml" />

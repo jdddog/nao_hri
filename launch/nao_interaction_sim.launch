@@ -2,7 +2,7 @@
     <include file="$(find nao_hri)/launch/nao_drivers.launch" />
 
     <!-- Fake people -->
-    <node pkg="tf" type="static_transform_publisher" name="base_link_to_map" args="0 0 1 0 0 0 /map /odom 20" />
+    <node pkg="tf" type="static_transform_publisher" name="base_link_to_map" args="-2 0 0 0 4.7 0 /map /nao_marker 20" />
 
     <node pkg="tf" type="static_transform_publisher" name="person1_head" args="2 2 1.9 0 0 0 /map /person1_head 20" />
     <node pkg="tf" type="static_transform_publisher" name="person1_torso" args="2 2 1 0 0 0 /map /person1_torso 20" />
