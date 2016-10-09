@@ -35,7 +35,9 @@ from optparse import OptionParser
 try:
     from naoqi import ALProxy, ALBroker, ALModule
 except ImportError:
-    raise RuntimeError("Error importing NaoQI. Please make sure that Aldebaran's NaoQI API is in your PYTHONPATH.")
+    msg = "Error importing NaoQI. Please make sure that Aldebaran's NaoQI API is in your PYTHONPATH."
+    rospy.logerr(msg)
+    raise RuntimeError(msg)
 
 
 class NaoNode(ALModule):

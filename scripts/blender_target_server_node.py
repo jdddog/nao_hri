@@ -89,7 +89,9 @@ class BlenderTargetServer(ITargetActionServer):
         elif name == 'z':
             return 2
         else:
-            raise Exception('not a valid axis name: {0}'.format(name))
+            msg = 'not a valid axis name: {0}'.format(name)
+            rospy.logerr(msg)
+            raise Exception(msg)
 
     def execute(self, gaze_goal):
         self.enable_srv()

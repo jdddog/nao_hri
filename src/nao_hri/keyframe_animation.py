@@ -27,6 +27,7 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import math
+import rospy
 from copy import deepcopy
 
 
@@ -89,7 +90,9 @@ class KeyframeAnimation():
 
     #Desired time in seconds
     def get_ntk(self, desired_time):
-        raise NotImplementedError("Please Implement this method: returns names, times and keys for a gesture")
+        msg = "Please Implement this method: returns names, times and keys for a gesture"
+        rospy.logerr(msg)
+        raise NotImplementedError(msg)
 
 
 class AtomicAnimation(KeyframeAnimation):

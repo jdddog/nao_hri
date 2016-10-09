@@ -78,7 +78,7 @@ class Smoother():
             self.input_topic = rospy.get_param("~input_topic")
         except:
             err = 'Please specify an input topic'
-            rospy.logerr('Please specify an input topic')
+            rospy.logerr(err)
             raise Exception(err)
 
         try:

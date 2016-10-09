@@ -109,7 +109,7 @@ class NaoTextToSpeechActionServer(ITextToSpeechActionServer, NaoNode):
             self.subscribe()
             ITextToSpeechActionServer.start(self)
         else:
-            raise Exception('nao_tts_cache parameter not found')
+            rospy.logerr('nao_tts_cache parameter not found')
 
     def synthesise_sentence(self, sentence):
         print("synthesising!", sentence)
